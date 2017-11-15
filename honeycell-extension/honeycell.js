@@ -2,7 +2,7 @@
 
     var connected = false;
     var device = null; // change to honeycell
-    var rawData = null;
+    var rawData = new Uint8Array();
 
     ext._shutdown = function() {};
 
@@ -32,8 +32,7 @@
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
-            rawData = new Uint8Array(data);
-            console.log(rawData);
+            console.log(data);
         });
 
         watchdog = setTimeout(function() {
@@ -41,7 +40,7 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 5000);
+        }, 2000);
     }
 
     ext._shutdown = function() {
