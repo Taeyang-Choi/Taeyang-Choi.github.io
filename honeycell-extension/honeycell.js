@@ -30,7 +30,10 @@
     var comport = [];
     ext._deviceConnected = function(dev) {
         comport.push(dev);
-        if (!device) tryNextDevice();
+        if (!device) { 
+            tryNextDevice();
+            console.log("Try Connect!!");
+        }
     };
 
     var poller = null;
@@ -40,8 +43,6 @@
         if(!device) return;
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-        console.log(comport);
-        console.log(device);
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
             connected = true;
@@ -65,7 +66,7 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 5000);
+        }, 2500);
     }
 
     ext._shutdown = function() {
