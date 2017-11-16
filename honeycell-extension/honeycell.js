@@ -4,7 +4,12 @@
     var device = null; // change to honeycell
     var rawData = new Uint8Array();
 
-    ext._shutdown = function() {};
+    ext._shutdown = function() {
+        console.log('Extension Shutdowned');
+       // if(poller) poller = clearInterval(poller);
+        if(device) device.close();
+        device = null;
+    };
 
     ext._getStatus = function() {
         if (!connected)
@@ -15,6 +20,9 @@
 
     ext._deviceRemoved = function(dev) {
         console.log('Device removed');
+        if(device != dev) return;
+       // if(poller) poller = clearInterval(poller);
+        device = null;
     };
 
     var comport = [];
