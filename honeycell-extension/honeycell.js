@@ -2,11 +2,11 @@
 
     var connected = false;
     var device = null; // change to honeycell
-    var rawData = new Uint8Array();
+    var rawData = null;
 
     ext._shutdown = function() {
         console.log('Extension Shutdowned');
-       // if(poller) poller = clearInterval(poller);
+       if(poller) poller = clearInterval(poller);
         if(device) device.close();
         device = null;
     };
@@ -21,7 +21,7 @@
     ext._deviceRemoved = function(dev) {
         console.log('Device removed');
         if(device != dev) return;
-       // if(poller) poller = clearInterval(poller);
+        if(poller) poller = clearInterval(poller);
         device = null;
     };
 
@@ -33,22 +33,28 @@
 
     var poller = null;
     var watchdog = null;
-    function tryNextDevice() {
+    function tryNextDevice() {  
         device = comport.shift();
         if(!device) return;
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
-            console.log(data);
-            console.log("test1");
+            rawData = new Uint8Array(data);
+            console.log(rawData);
             if (watchdog) {
                 clearTimeout(watchdog);
                 watchdog = null;
             }
         });
 
+        poller = setInterval(function() {
+            //device.send("something in");
+        }, 50);
+
         watchdog = setTimeout(function() {
+            clearInterval(poller);
+            poller = null;
             device.set_receive_handler(null);
             device.close();
             device = null;
