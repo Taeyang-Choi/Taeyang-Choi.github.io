@@ -44,7 +44,7 @@
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
-        console.log("initFlag:" + initFlag + "pinging: " + pinging + "pingCount:" + pingCount);
+        console.log("initFlag:" + initFlag + " pinging: " + pinging + " pingCount:" + pingCount);
         device.set_receive_handler(function(data) {
             processInput(data);
         });
@@ -91,6 +91,8 @@
                 connected = false;
                 if (device) device.close();
                 device = null;
+                pinging = false;
+                console.log("pinger setInterval call!!");
                 return;
             }
         } else {
