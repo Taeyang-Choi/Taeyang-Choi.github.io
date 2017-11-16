@@ -33,6 +33,10 @@
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
             console.log(data);
+            if (watchdog) {
+                clearTimeout(watchdog);
+                watchdog = null;
+            }
         });
 
         watchdog = setTimeout(function() {
