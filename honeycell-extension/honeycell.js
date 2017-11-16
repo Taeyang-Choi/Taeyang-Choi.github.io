@@ -32,7 +32,7 @@
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
-            console.log(data + "test");
+            console.log(data);
             console.log("test1");
             if (watchdog) {
                 clearTimeout(watchdog);
