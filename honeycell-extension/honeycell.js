@@ -53,7 +53,7 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 200);
+        }, 5000);
     }
 
     ext._shutdown = function() {
