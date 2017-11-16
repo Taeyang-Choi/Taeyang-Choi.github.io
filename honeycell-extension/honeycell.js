@@ -40,11 +40,13 @@
         if(!device) return;
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
+        console.log(comport);
+        console.log(device);
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
             connected = true;
             rawData = new Uint8Array(data);
-            console.log(rawData);
+            //console.log(rawData);
             if (watchdog) {
                 clearTimeout(watchdog);
                 watchdog = null;
