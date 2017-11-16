@@ -43,20 +43,10 @@
         if(!device) return;
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-        console.log('Attempting connection with ' + device.id);
+        console.log('Attempting connection with ' + device.id);q
         device.set_receive_handler(function(data) {
-            connected = true;
-            rawData = new Uint8Array(data);
-            //console.log(rawData);
-            if (watchdog) {
-                clearTimeout(watchdog);
-                watchdog = null;
-            }
+            processInput();
         });
-
-        poller = setInterval(function() {
-            //device.send("something in");
-        }, 50);
 
         watchdog = setTimeout(function() {
             clearInterval(poller);
@@ -66,7 +56,52 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 2500);
+        }, 2500); 
+    }
+
+    var initFlag = false;
+    var pinging = false;
+    var pingCount = 0;
+    var pinger = null;
+    function processInput() {
+        if(!initFlag) {
+            connected = true;
+            if (watchdog) {
+                clearTimeout(watchdog);
+                watchdog = null;
+            }
+            init();
+            initFlag = true;
+        } else {
+            rawData = new Uint8Array(data);
+            console.log(rawData);
+            pinging = false;
+            pingCount = 0;
+
+        }
+    }
+
+    function init() {
+        pinger = setInterval(function() {
+        if (pinging) {
+            if (++pingCount > 6) {
+                clearInterval(pinger);
+                initFlag = false;
+                pinger = null;
+                connected = false;
+                if (device) device.close();
+                device = null;
+                return;
+            }
+        } else {
+            if (!device) {
+                clearInterval(pinger);
+                pinger = null;
+                return;
+            }
+            pinging = true;
+        }
+        }, 100);
     }
 
     ext._shutdown = function() {
