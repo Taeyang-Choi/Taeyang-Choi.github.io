@@ -45,7 +45,7 @@
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
-            processInput();
+            processInput(data);
         });
 
         watchdog = setTimeout(function() {
@@ -63,7 +63,7 @@
     var pinging = false;
     var pingCount = 0;
     var pinger = null;
-    function processInput() {
+    function processInput(data) {
         if(!initFlag) {
             connected = true;
             if (watchdog) {
