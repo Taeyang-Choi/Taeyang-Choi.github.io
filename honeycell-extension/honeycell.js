@@ -34,10 +34,10 @@
         device.set_receive_handler(function(data) {
             console.log(data);
             console.log("test1");
-            if (watchdog) {
+            /*if (watchdog) {
                 clearTimeout(watchdog);
                 watchdog = null;
-            }
+            }*/
         });
 
         watchdog = setTimeout(function() {
@@ -45,7 +45,7 @@
             device.close();
             device = null;
             tryNextDevice();
-        }, 2000);
+        }, 200);
     }
 
     ext._shutdown = function() {
