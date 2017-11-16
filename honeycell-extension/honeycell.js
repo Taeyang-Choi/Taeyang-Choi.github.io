@@ -6,7 +6,8 @@
 
     ext._shutdown = function() {
         console.log('Extension Shutdowned');
-       if(poller) poller = clearInterval(poller);
+        if(connected) connected = false;
+        if(poller) poller = clearInterval(poller);
         if(device) device.close();
         device = null;
     };
@@ -20,6 +21,7 @@
 
     ext._deviceRemoved = function(dev) {
         console.log('Device removed');
+        if(connected) connected = false;
         if(device != dev) return;
         if(poller) poller = clearInterval(poller);
         device = null;
@@ -55,6 +57,7 @@
 
         watchdog = setTimeout(function() {
             clearInterval(poller);
+            if(connected) connected = false;
             poller = null;
             device.set_receive_handler(null);
             device.close();
@@ -64,6 +67,7 @@
     }
 
     ext._shutdown = function() {
+        if(connected) connected = false;
         if (device) device.close();
         device = null;
     };
