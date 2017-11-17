@@ -30,10 +30,10 @@
     var comport = [];
     ext._deviceConnected = function(dev) {
         comport.push(dev);
-        if (!device) { 
+        /*if (!device) { 
             tryNextDevice();
             console.log("Try Connect!!");
-        }
+        }*/
     };
 
     var poller = null;
@@ -124,14 +124,81 @@
         return "test";
     };
 
+    ext.ledToggle = function(toggle, index) {
+
+    };
+
+    ext.led = function(red, green, blue, index) {
+
+    };
+
+    ext.ledPwm = function(red, green, blue, index) {
+
+    };
+
+    ext.dcMotor = function(dir, spd, index) {
+
+    };
+
+    ext.stop = function() {
+
+    }
+
+    ext.moveDirect = function(dir, spd) {
+
+    };
+
+    ext.move = function(l_dir, l_spd, r_dir, r_spd) {
+
+    };
+
+    ext.buzzer = function(hz, index) {
+
+    };
+
+    ext.sevenSegment = function(value, index) {
+
+    };
+
+    var paramString = window.location.search.replace(/^\?|\/$/g, '');
+    var vars = paramString.split("&");
     var lang = 'en';
+    for (var i=0; i<vars.length; i++) {
+        var pair = vars[i].split('=');
+    if (pair.length > 1 && pair[0]=='lang')
+        lang = pair[1];
+    }
 
     var blocks = {
         en: [
-            ['r', 'Measure Sensor %m.mesures No: %m.index', 'inputSensor', 'IR', 1]
+            ['r', 'Measure Sensor %m.mesures No: %m.index', 'inputSensor', 'IR', 1],
+            ['r', 'Recognition Sensor %m.recognitions No: %m.index', 'inputSensor', 'PIR', 1],
+            ['r', 'Position Sensor %m.positions No: %m.index', 'inputSensor', 'IMU_X', 1],
+            ['r', 'Environment Sensor %m.environments No: %m.index', 'inputSensor', 'CO2', 1],
+            [' ', 'LED %m.ledtoggle No: %m.index', 'ledToggle', 'ON', 1],
+            [' ', '3-LED RED: %m.ledtoggle GREEN: %m.ledtoggle BLUE: %m.ledtoggle No: %m.index', 'led', 'ON', 'ON', 'ON', 1],
+            [' ', '3-LED RED: %n GREEN: %n BLUE: %n No: %mindex', 'ledToggle', 0, 0, 0, 1],
+            [' ', 'DC Motor move %m.dcmotor at %n speed No: %m.index', 'clockwise', 100, 1],
+            [' ', 'All DC Motors stop', 'stop'],
+            [' ', 'Mobile Robot move %m.directs at %n speed', 'moveDirect', 'forward', 100],
+            [' ', 'Mobile Robot left wheel %m.dcmotor at %n speed right wheel %m.dcmotor at %n speed', 'clockwise', 100, 'counterclockwise', 100],
+            [' ', 'Buzzer %n Hz No: %m.index', 'buzzer', 250, 1],
+            [' ', '7Segment Value: %m.sevensegment No: %m.index', 1, 1]
         ],
         ko: [
-            ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1]
+            ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1],
+            ['r', '인식센서 %m.recognitions 번호: %m.index', 'inputSensor', '인체감지', 1],
+            ['r', '관성측정센서 %m.positions 번호: %m.index', 'inputSensor', 'X', 1],
+            ['r', '환경센서 %m.environments 번호: %m.index', 'inputSensor', '공기질감지', 1],
+            [' ', 'LED %m.ledtoggle 번호: %m.index', 'ledToggle', '켜기', 1],
+            [' ', '3색LED 빨강: %m.ledtoggle 초록: %m.ledtoggle 파랑: %m.ledtoggle 번호: %m.index', 'led', '켜기', '켜기', '켜기', 1],
+            [' ', '3색LED 빨강: %n 초록: %n 파랑: %n 번호: %mindex', 'ledToggle', 0, 0, 0, 1],
+            [' ', 'DC 모터 방향 %m.dcmotor 속도: %n 번호: %m.index', '시계방향', 100, 1],
+            [' ', '모든 DC모터 정지하기', 'stop'],
+            [' ', '모바일로봇 %m.directs 으로 움직이기 속도: %n', 'moveDirect', '앞', 100],
+            [' ', '모바일로봇 왼쪽바퀴 %m.dcmotor 속도: %n 오른쪽바퀴: %m.dcmotor 속도: %n ', 'clockwise', 100, 'counterclockwise', 100],
+            [' ', '부저 %n Hz 번호: %m.index', 'buzzer', 250, 1],
+            [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 1, 1]
         ]
     };
 
