@@ -1,7 +1,7 @@
 (function(ext) {
 
     var connected = false;
-    var device = null; // change to honeycell
+    var device = null; 
     var rawData = null;
 
     ext._shutdown = function() {
@@ -80,11 +80,11 @@
             pingCount = 0;
         }
     }
-
+        
     function init() {
         pinger = setInterval(function() {
         if (pinging) {
-            if (++pingCount > 15) {
+            if (++pingCount > 6) {
                 clearInterval(pinger);
                 initFlag = false;
                 pinger = null;
@@ -120,10 +120,49 @@
         }, wait*1000);
     };
 
-    var descriptor = {
-        blocks: [
-            ['w', 'wait for random time', 'wait_random'],
+    ext.inputSensor = function(module, index) {
+        return "test";
+    };
+
+    var lang = 'en';
+
+    var blocks = {
+        en: [
+            ['r', 'Measure Sensor %m.mesures No: %m.index', 'inputSensor', 'IR', 1]
+        ],
+        ko: [
+            ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1]
         ]
+    };
+
+    var menus = {
+        en: {
+            index: [1, 2, 3, 4],
+            mesures: ['IR', 'PSD', 'CDS', 'MIC', 'COLOR'],
+            recognitions: ['PIR', 'TOUCH', 'HALL'],
+            positions: ['IMU_X', 'IMU_Y', 'IMU_Z'],
+            environments: ['CO2', 'SMOKE', 'UV', 'ALCOHOL', 'TEMP', 'HUMI'],
+            ledtoggle: ['ON', 'OFF'],
+            dcmotor: ['clockwise', 'counterclockwise'],
+            directs: ['forward', 'backward', 'left', 'right'],
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        },
+        ko: {
+            index: [1, 2, 3, 4],
+            mesures: ['바닥감지', '거리감지', '조도감지', '소리감지', '컬러감지'],
+            recognitions: ['인체감지', '터치감지', '근접감지'],
+            positions: ['X', 'Y', 'Z'],
+            environments: ['공기질감지', '연기감지', '자외선감지', '알코올감지', '온도감지', '습도감지'],
+            ledtoggle: ['켜기', '끄기'],
+            dcmotor: ['시계방향', '반시계방향'],
+            directs: ['앞', '뒤', '왼쪽', '오른쪽'],
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        }
+    }
+
+    var descriptor = {
+        blocks: blocks[lang],
+        menus: menus[lang]
     };
     
     ScratchExtensions.register('HoneyCell', descriptor, ext, {type:'serial'});
