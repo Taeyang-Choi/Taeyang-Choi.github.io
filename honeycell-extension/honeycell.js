@@ -247,7 +247,7 @@
                     var key = InputCMD[lsbToMsb2Bit(hdLocalData.sensorType[i]) + hdLocalData.sensorId[i]];
                     if(key != "NULL"){
                         rqRemoteData[key][hdLocalData.sensorNo[i]] = hdLocalData.sensorData[i];
-                        console.log("key: " + key + " value: " + hdLocalData.sensorData[i]);
+                        //console.log("key: " + key + " value: " + hdLocalData.sensorData[i]);
                         //handler.write(key + hdLocalData.sensorNo[i], hdLocalData.sensorData[i]);
                     }
                 }
