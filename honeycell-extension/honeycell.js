@@ -197,7 +197,7 @@
     };
 
     handleLocalData = function(data) {
-        Array.prototype.push.apply(this.receiveData, data);
+        Array.prototype.push.apply(this.receiveData, Array.from(data));
         if(this.receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
             for(var i=0; i<this.receiveData.length; i++) {
                 if(this.receiveData[i] == HoneyCell.STX) {
@@ -328,9 +328,9 @@
             initFlag = true;
         } else {
             rawData = new Uint8Array(data);
-            console.log(typeof rawData);
-            //handleLocalData(rawData);
-            //requestRemoteData();
+            //console.log(typeof rawData);
+            handleLocalData(rawData);
+            requestRemoteData();
             //console.log(rawData);
             pinging = false;
             pingCount = 0;
