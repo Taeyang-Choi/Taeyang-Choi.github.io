@@ -202,7 +202,7 @@
         }, receiveData);
         //Array.prototype.push.apply(this.receiveData, Array.from(data));
         if(receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
-            for(var i=0; i<this.receiveData.length; i++) {
+            for(var i=0; i<receiveData.length; i++) {
                 if(receiveData[i] == HoneyCell.STX) {
                     receiveData = receiveData.splice(i, receiveData.length-i);
                     return;
