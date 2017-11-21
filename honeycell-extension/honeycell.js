@@ -209,18 +209,18 @@
                 }
             }
         }
-        console.log(receiveData);
+        //console.log(receiveData);
     };
 
     requestRemoteData = function() { // default function(handler)
-        var rqRemoteData = this.rqRemoteData;
-        if(this.receiveData.length < 12) return;
-        for(var i=0; i<parseInt(this.receiveData.length / 12); i++) {
-            var _data = this.receiveData.splice(0, 12);
+        //var rqRemoteData = this.rqRemoteData;
+        if(receiveData.length < 12) return;
+        for(var i=0; i<parseInt(receiveData.length / 12); i++) {
+            var _data = receiveData.splice(0, 12);
             if(_data.pop() == HoneyCell.ETX){
                 var chunk, value;
                 var crc_type, crc_idno, crc_data;
-                var hdLocalData = this.hdLocalData;
+                //var hdLocalData = this.hdLocalData;
                 var type, idno, data, crc;
 
                 _data.shift();
@@ -242,9 +242,9 @@
                     value = data[i];
                     hdLocalData.sensorData[i] = value;  
                 }
-                if(crc != this.generateCRC(type, idno, data)) return;
+                if(crc != generateCRC(type, idno, data)) return;
                 for(i=0; i<HoneyCell.MAX_NUMBER_OF_MODULES; i++){ 
-                    var key = InputCMD[this.lsbToMsb2Bit(hdLocalData.sensorType[i]) + hdLocalData.sensorId[i]];
+                    var key = InputCMD[lsbToMsb2Bit(hdLocalData.sensorType[i]) + hdLocalData.sensorId[i]];
                     if(key != "NULL"){
                         rqRemoteData[key][hdLocalData.sensorNo[i]] = hdLocalData.sensorData[i];
                         console.log("key: " + key + " value: " + hdLocalData.sensorData[i]);
@@ -334,7 +334,7 @@
             rawData = new Uint8Array(data);
             //console.log(typeof rawData);
             handleLocalData(rawData);
-            //requestRemoteData();
+            requestRemoteData();
             //console.log(rawData);
             pinging = false;
             pingCount = 0;
