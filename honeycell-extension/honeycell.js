@@ -1,4 +1,257 @@
 (function(ext) {
+    var hdLocalData = {
+        sensorType: [0, 0, 0, 0],
+        sensorId: [0, 0, 0, 0],
+        sensorNo: [0, 0, 0, 0],
+        sensorData: [0, 0, 0, 0]
+    };
+
+    var hdRemoteData = {
+        DC_MOTOR:[false, null, null, null, null],
+        BUZZER:[false, null, null, null, null],
+        SEVEN_SEGMENT:[false, null, null, null, null],
+        LED_R:[false, null, null, null, null],
+        LED_G:[false, null, null, null, null],
+        LED_B:[false, null, null, null, null]
+    };
+
+    var rqRemoteData = {
+        IR:[null, null, null, null],
+        PSD:[null, null, null, null],
+        CDS:[null, null, null, null],
+        MIC:[null, null, null, null],
+        COLOR:[null, null, null, null],
+
+        PIR:[null, null, null, null],
+        TOUCH:[null, null, null, null],
+        HALL:[null, null, null, null],
+
+        IMU_X:[null, null, null, null],
+        IMU_Y:[null, null, null, null],
+        IMU_Y:[null, null, null, null],
+
+        CO2_:[null, null, null, null],
+        SMOKE:[null, null, null, null],
+        UV:[null, null, null, null],
+        ALCOHOL:[null, null, null, null],
+        TEMP:[null, null, null, null],
+        HUMI:[null, null, null, null],
+    };
+
+    var setZero = {
+        set_zero: false
+    };
+
+    var receiveData = [];
+    var linetracer = {
+        flag: false,
+        speed: null,
+        threshold: [120, 120]
+    };
+
+    var HoneyCell = {
+        // index table
+        STX_IDX: 0,
+        TYPE_IDX: 1,
+        IDNO_IDX: [2, 3, 4, 5],
+        DATA_IDX: [6, 7, 8, 9],
+        CRC_IDX: 10, 
+        ETX_IDX: 11,
+        FLAG: 0, 
+        STX: 0x02, 
+        ETX: 0x03,
+        MAX_NUMBER_OF_MODULES: 4,
+        // key table
+        SET_ZERO: "set_zero",
+        // output_keytable
+        DC_MOTOR: "dc_motor",
+        MOVE: "move",
+        STOP: "stop",
+        LINE_TRACER: "line_tracer",
+        THRESHOLD: "threshold",
+        BUZZER: "buzzer",
+        SEVEN_SEGMENT: "seven_segment",
+        LED_R: "led_r",  
+        LED_G: "led_g",  
+        LED_B: "led_b"
+    };
+
+    var InputCMD = {
+        0: "NULL", // 0x00
+        // Measure Sensors
+        1: "IR", // 0x01 바닥감지센서
+        2: "PSD", // 0x02 거리감지센서
+        3: "CDS", // 0x03 조도센서
+        4: "MIC", // 0x04 마이크센서
+        5: "COLOR", // 0x05 컬러감지센서
+        // Recognition Sensors
+        6: "PIR", // 0x06 인체감지센서
+        7: "TOUCH", // 0x07 터치센서
+        8: "HALL", // 0x08 근접센서
+        // Position Sensors
+        9: "IMU_X", // 0x09 관성측정센서 X좌표 값 
+        10: "IMU_Y", // 0x0A 관성측정센서 Y좌표 값
+        11: "IMU_Z", // 0x0B 관성측정센서 Z좌표 값
+        // Environment Sensors
+        33: "CO2_", // 0x21 공기질센서
+        34: "SMOKE", // 0x22 연기센서
+        35: "UV", // 0x23 자외선센서
+        36: "ALCOHOL", // 0x24 알코올센서
+        37: "TEMP", // 0x25 온도센서
+        38: "HUMI" // 0x26 습도센서
+    };
+
+    var OutputCMD = {
+        NULL: 0x00,
+        DC_MOTOR: 0x11,
+        BUZZER: 0x14,
+        SEVEN_SEGMENT: 0x16, 
+        LED_R: 0x17,  
+        LED_G: 0x18,  
+        LED_B: 0x19
+    };
+
+    lsb4BitExt = function(number){
+        var value = parseInt(number);
+        value = value & 0x0F;
+        return value;
+    };
+
+    lsbToMsb = function(number){
+        var value = parseInt(number);
+        value = (value << 4) & 0xF0;
+        return value;
+    };
+
+    lsbToMsb2Bit = function(number){
+        var value = parseInt(number);
+        value = (value << 4) & 0x30;
+        return value;
+    };
+
+    msbToLsb2Bit = function(number){
+        var value = parseInt(number);
+        value = (value >> 4) & 0x03;
+        return value;
+    };
+
+    generateCRC = function(type, idno, data){
+        var value = HoneyCell.STX + HoneyCell.ETX;
+        var i, result;
+        
+        value += type[0];
+        for(i=0; i<HoneyCell.MAX_NUMBER_OF_MODULES; i++)
+            value += idno[i];
+        for(i=0; i<HoneyCell.MAX_NUMBER_OF_MODULES; i++)
+            value += data[i];
+
+        result = value & 0xFF;
+
+        return result;
+    };
+
+    lineTracer = function(linetracer, hdRemoteData, rqRemoteData) {
+        var fValue, bValue;
+        var pLeft, pRight;
+
+        if(linetracer.speed > 127) {
+            fValue = 0x7F;
+            bValue = 0xFF;
+        } else if((linetracer.speed <= 127) && (linetracer.speed >= 0)) {
+            fValue = linetracer.speed & 0x7F;
+            bValue = 0x80 | (linetracer.speed & 0x7F);
+        }
+
+        pLeft = rqRemoteData.PSD[0];
+        pRight = rqRemoteData.PSD[1];
+
+        if(pLeft > linetracer.threshold[0]) {
+            if(pRight > linetracer.threshold[1]) {
+                if(!(hdRemoteData.DC_MOTOR[1] == bValue && hdRemoteData.DC_MOTOR[2] == fValue)) {
+                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
+                    hdRemoteData.DC_MOTOR[1] = bValue;
+                    hdRemoteData.DC_MOTOR[2] = fValue;              
+                }
+            } else {
+                if(!(hdRemoteData.DC_MOTOR[1] == bValue && hdRemoteData.DC_MOTOR[2] == 0)) {
+                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
+                    hdRemoteData.DC_MOTOR[1] = bValue;
+                    hdRemoteData.DC_MOTOR[2] = 0;
+                }
+            }
+        } else {
+            if(pRight > linetracer.threshold[1]) {
+                if(!(hdRemoteData.DC_MOTOR[1] == 0 && hdRemoteData.DC_MOTOR[2] == fValue)) {
+                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
+                    hdRemoteData.DC_MOTOR[1] = 0;
+                    hdRemoteData.DC_MOTOR[2] = fValue;              
+                }
+            } else {
+                if(!(hdRemoteData.DC_MOTOR[1] == 0 && hdRemoteData.DC_MOTOR[2] == 0)) {
+                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
+                    hdRemoteData.DC_MOTOR[1] = 0;
+                    hdRemoteData.DC_MOTOR[2] = 0;           
+                }
+            }
+        }
+    };
+
+    handleLocalData = function(data) {
+        Array.prototype.push.apply(this.receiveData, data);
+        if(this.receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
+            for(var i=0; i<this.receiveData.length; i++) {
+                if(this.receiveData[i] == HoneyCell.STX) {
+                    this.receiveData = this.receiveData.splice(i, this.receiveData.length-i);
+                    return;
+                }
+            }
+        }
+    };
+
+    requestRemoteData = function() { // default function(handler)
+        var rqRemoteData = this.rqRemoteData;
+        if(this.receiveData.length < 12) return;
+        for(var i=0; i<parseInt(this.receiveData.length / 12); i++) {
+            var _data = this.receiveData.splice(0, 12);
+            if(_data.pop() == HoneyCell.ETX){
+                var chunk, value;
+                var crc_type, crc_idno, crc_data;
+                var hdLocalData = this.hdLocalData;
+                var type, idno, data, crc;
+
+                _data.shift();
+                type = _data.splice(0, 1);
+                idno = _data.splice(0, 4);
+                data = _data.splice(0, 4);
+                crc = _data.splice(0, 1);
+
+                for(i=0; i<HoneyCell.MAX_NUMBER_OF_MODULES; i++){
+                    // replacement type
+                    value = (type[0] >> (6-i*2)) & 0x03;
+                    hdLocalData.sensorType[i] = value;
+                    // replacement idno
+                    value = (idno[i] >> 4) & 0x0F;
+                    hdLocalData.sensorId[i] = value;
+                    value = idno[i] & 0x0F;
+                    hdLocalData.sensorNo[i] = value;
+                    // replacement data
+                    value = data[i];
+                    hdLocalData.sensorData[i] = value;  
+                }
+                if(crc != this.generateCRC(type, idno, data)) return;
+                for(i=0; i<HoneyCell.MAX_NUMBER_OF_MODULES; i++){ 
+                    var key = InputCMD[this.lsbToMsb2Bit(hdLocalData.sensorType[i]) + hdLocalData.sensorId[i]];
+                    if(key != "NULL"){
+                        rqRemoteData[key][hdLocalData.sensorNo[i]] = hdLocalData.sensorData[i];
+                        console.log("key: " + key + " value: " + hdLocalData.sensorData[i]);
+                        //handler.write(key + hdLocalData.sensorNo[i], hdLocalData.sensorData[i]);
+                    }
+                }
+            }
+        }
+    };
+
+
 
     var connected = false;
     var device = null; 
@@ -30,10 +283,10 @@
     var comport = [];
     ext._deviceConnected = function(dev) {
         comport.push(dev);
-        /*if (!device) { 
+        if (!device) { 
             tryNextDevice();
             console.log("Try Connect!!");
-        }*/
+        }
     };
 
     var poller = null;
@@ -75,7 +328,9 @@
             initFlag = true;
         } else {
             rawData = new Uint8Array(data);
-            console.log(rawData);
+            handleLocalData(rawData);
+            requestRemoteData();
+            //console.log(rawData);
             pinging = false;
             pingCount = 0;
         }
