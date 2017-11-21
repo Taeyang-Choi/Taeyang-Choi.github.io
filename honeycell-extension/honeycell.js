@@ -383,7 +383,7 @@
     ext.inputSensor = function(module, index) {
         var key = Object.keys(InputCMD).find(key => InputCMD[key] === module);
         if(key) {
-            return rqRemoteData[module][index]; 
+            return rqRemoteData[module][index-1]; 
         } else {
             return 0;
         }
