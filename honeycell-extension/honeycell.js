@@ -297,7 +297,7 @@
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
-        console.log("initFlag:" + initFlag + " pinging: " + pinging + " pingCount:" + pingCount);
+        //console.log("initFlag:" + initFlag + " pinging: " + pinging + " pingCount:" + pingCount);
         device.set_receive_handler(function(data) {
             processInput(data);
         });
@@ -328,8 +328,9 @@
             initFlag = true;
         } else {
             rawData = new Uint8Array(data);
-            handleLocalData(rawData);
-            requestRemoteData();
+            console.log(typeof rawData);
+            //handleLocalData(rawData);
+            //requestRemoteData();
             //console.log(rawData);
             pinging = false;
             pingCount = 0;
