@@ -199,7 +199,7 @@
     handleLocalData = function(data) {
         data.forEach(function(element) {
             this.receiveData.push(element);
-        })
+        }, this.receiveData);
         //Array.prototype.push.apply(this.receiveData, Array.from(data));
         if(this.receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
             for(var i=0; i<this.receiveData.length; i++) {
