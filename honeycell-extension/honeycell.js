@@ -381,7 +381,12 @@
     };
 
     ext.inputSensor = function(module, index) {
-        return "test";
+        var key = Object.keys(InputCMD).find(key => InputCMD[key] === module);
+        if(key) {
+            return rqRemoteData[module][index]; 
+        } else {
+            return 0;
+        }
     };
 
     ext.ledToggle = function(toggle, index) {
