@@ -197,6 +197,7 @@
     };
 
     handleLocalData = function(data) {
+        console.log(receiveData);
         Array.prototype.push.apply(this.receiveData, Array.from(data));
         if(this.receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
             for(var i=0; i<this.receiveData.length; i++) {
