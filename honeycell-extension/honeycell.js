@@ -199,16 +199,17 @@
     handleLocalData = function(data) {
         data.forEach(function(element) {
             receiveData.push(element);
-        }, this.receiveData);
+        }, receiveData);
         //Array.prototype.push.apply(this.receiveData, Array.from(data));
-        if(this.receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
+        if(receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
             for(var i=0; i<this.receiveData.length; i++) {
-                if(this.receiveData[i] == HoneyCell.STX) {
-                    this.receiveData = this.receiveData.splice(i, this.receiveData.length-i);
+                if(receiveData[i] == HoneyCell.STX) {
+                    receiveData = receiveData.splice(i, receiveData.length-i);
                     return;
                 }
             }
         }
+        console.log(receiveData);
     };
 
     requestRemoteData = function() { // default function(handler)
@@ -333,7 +334,7 @@
             rawData = new Uint8Array(data);
             //console.log(typeof rawData);
             handleLocalData(rawData);
-            requestRemoteData();
+            //requestRemoteData();
             //console.log(rawData);
             pinging = false;
             pingCount = 0;
