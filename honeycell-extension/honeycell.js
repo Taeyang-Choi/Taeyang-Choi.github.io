@@ -253,6 +253,7 @@
     };
 
     handleRemoteData = function(handler) {
+        console.log("init handleRemoteData");
         if(handler.hasOwnProperty(HoneyCell.MOVE)) {
             if((hdRemoteData.DC_MOTOR[1]!=handler.fValue || hdRemoteData.DC_MOTOR[2]!=handler.bValue) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
@@ -287,11 +288,13 @@
         } else if(handler.hasOwnProperty(HoneyCell.THRESHOLD)) {
             linetracer.threshold[handler.idx] = handler.threshold;
         } else {
+            console.log("enter the else sentense");
             if(handler.hasOwnProperty(HoneyCell.LED_R)) {
                 buf = handler.read(HoneyCell.LED_R);
                 if(hdRemoteData.LED_R[handler.idx]!=handler.value_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
                     hdRemoteData.LED_R[HoneyCell.FLAG] = true;
                     hdRemoteData.LED_R[handler.idx] = handler.value_r;
+                    console.log("input led_r data");
                 }
             }
             if(handler.hasOwnProperty(HoneyCell.LED_G)) {
@@ -307,11 +310,11 @@
                 }
             }
         }
-
+        console.log("before linetracer");
         if(linetracer.flag) {
             lineTracer();
         }
-
+        console.log("before setzero");
         if(handler.hasOwnProperty(HoneyCell.SET_ZERO)) { // Always footer position in handleRemoteData function
             if(handler.flag){
                 setZero.set_zero = true;
@@ -320,6 +323,7 @@
                     hdRemoteData[key] = [true, 0, 0, 0, 0]; 
             }       
         }
+        console.log("end of handleRemoteData function");
     };
 
     requestLocalData = function() {
@@ -388,7 +392,6 @@
     };
 
     request = function(sendQueue) {
-        console.log("execute handleRemoteData function");
         handleRemoteData(sendQueue);
         console.log("execute requestLocalData function");
         var rqValue = requestLocalData();
@@ -533,7 +536,6 @@
 
         if('ON' == toggle) { sq.led_r = 255; sq.led_g = 255; sq.led_b = 255; }
         else if('OFF' == toggle) { sq.led_r = 0; sq.led_g = 0; sq.led_b = 0; }
-        console.log(sq);
         request(sq);
     };
 
