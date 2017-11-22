@@ -324,6 +324,7 @@ console.log("1");
         var rqLocalData = new Array();
         var cnt = 0, index = 0, cValue; 
 console.log("2");
+console.log(hdRemoteData.LED_R[HoneyCell.FLAG]);
         for(var key in hdRemoteData) {
             if(hdRemoteData[key][HoneyCell.FLAG]) {
                 for(var i=1; i<HoneyCell.MAX_NUMBER_OF_MODULES+1; i++) {
