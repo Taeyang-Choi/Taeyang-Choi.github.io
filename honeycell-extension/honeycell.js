@@ -150,7 +150,7 @@
         return result;
     };
 
-    lineTracer = function(linetracer, hdRemoteData, rqRemoteData) {
+    lineTracer = function() {
         var fValue, bValue;
         var pLeft, pRight;
 
@@ -200,7 +200,6 @@
         data.forEach(function(element) {
             receiveData.push(element);
         }, receiveData);
-        //Array.prototype.push.apply(this.receiveData, Array.from(data));
         if(receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
             for(var i=0; i<receiveData.length; i++) {
                 if(receiveData[i] == HoneyCell.STX) {
@@ -213,14 +212,12 @@
     };
 
     requestRemoteData = function() { // default function(handler)
-        //var rqRemoteData = this.rqRemoteData;
         if(receiveData.length < 12) return;
         for(var i=0; i<parseInt(receiveData.length / 12); i++) {
             var _data = receiveData.splice(0, 12);
             if(_data.pop() == HoneyCell.ETX){
                 var chunk, value;
                 var crc_type, crc_idno, crc_data;
-                //var hdLocalData = this.hdLocalData;
                 var type, idno, data, crc;
 
                 _data.shift();
@@ -253,6 +250,147 @@
                 }
             }
         }
+    };
+
+    Module.prototype.handleRemoteData = function(handler) {
+        if(handler.hasOwnProperty(HoneyCell.MOVE)) {
+            if((hdRemoteData.DC_MOTOR[1]!=handler.fValue || hdRemoteData.DC_MOTOR[2]!=handler.bValue) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
+                hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
+                hdRemoteData.DC_MOTOR[1] = handler.fValue;
+                hdRemoteData.DC_MOTOR[2] = handler.bValue;
+            }
+        } else if(handler.hasOwnProperty(HoneyCell.STOP) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
+            if(hdRemoteData.DC_MOTOR[1]!=0 || hdRemoteData.DC_MOTOR[2]!=0 || hdRemoteData.DC_MOTOR[3]!=0 || hdRemoteData.DC_MOTOR[4]!=0) {
+                hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
+                for(var i=0; i<HoneyCell.MAX_NUMBER_OF_MODULES; i++)
+                    hdRemoteData.DC_MOTOR[i+1] = 0;
+                linetracer.flag = false;
+            }
+        }  else if(handler.hasOwnProperty(HoneyCell.LINE_TRACER) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
+            linetracer.flag = true;
+            linetracer.speed = handler.speed;
+        } else if(handler.hasOwnProperty(HoneyCell.DC_MOTOR)) {
+            if(hdRemoteData.DC_MOTOR[handler.idx]!=handler.value && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
+                hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
+                hdRemoteData.DC_MOTOR[handler.idx] = handler.value;
+            }
+        } else if(handler.hasOwnProperty(HoneyCell.BUZZER)) {
+            if(hdRemoteData.BUZZER[handler.idx]!=handler.value && (!hdRemoteData.BUZZER[HoneyCell.FLAG])) {
+                hdRemoteData.BUZZER[HoneyCell.FLAG] = true;
+                hdRemoteData.BUZZER[handler.idx] = handler.value;   
+            }
+        } else if(handler.hasOwnProperty(HoneyCell.SEVEN_SEGMENT)) {
+            if(hdRemoteData.SEVEN_SEGMENT[handler.idx]!=handler.value && (!hdRemoteData.SEVEN_SEGMENT[HoneyCell.FLAG])) {
+                hdRemoteData.SEVEN_SEGMENT[HoneyCell.FLAG] = true;
+                hdRemoteData.SEVEN_SEGMENT[handler.idx] = handler.value;    
+            }
+        } else if(handler.hasOwnProperty(HoneyCell.THRESHOLD)) {
+            linetracer.threshold[handler.idx] = handler.threshold;
+        } else {
+            if(handler.hasOwnProperty(HoneyCell.LED_R)) {
+                buf = handler.read(HoneyCell.LED_R);
+                if(hdRemoteData.LED_R[handler.idx]!=handler.value_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
+                    hdRemoteData.LED_R[HoneyCell.FLAG] = true;
+                    hdRemoteData.LED_R[handler.idx] = handler.value_r;
+                }
+            }
+            if(handler.hasOwnProperty(HoneyCell.LED_G)) {
+                if(hdRemoteData.LED_G[handler.idx]!=handler.value_g && (!hdRemoteData.LED_G[HoneyCell.FLAG])) {
+                    hdRemoteData.LED_G[HoneyCell.FLAG] = true;
+                    hdRemoteData.LED_G[handler.idx] = handler.value_g;
+                }
+            }
+            if(handler.hasOwnProperty(HoneyCell.LED_B)) {
+                if(hdRemoteData.LED_B[handler.idx]!=handler.value_b && (!hdRemoteData.LED_B[HoneyCell.FLAG])) {
+                    hdRemoteData.LED_B[HoneyCell.FLAG] = true;
+                    hdRemoteData.LED_B[handler.idx] = handler.value_b;
+                }
+            }
+        }
+
+        if(linetracer.flag) {
+            lineTracer();
+        }
+
+        if(handler.hasOwnProperty(HoneyCell.SET_ZERO)) { // Always footer position in handleRemoteData function
+            if(handler.flag){
+                setZero.set_zero = true;
+                linetracer.flag = false;
+                for(var key in hdRemoteData)
+                    hdRemoteData[key] = [true, 0, 0, 0, 0]; 
+            }       
+        }
+    };
+
+    requestLocalData = function() {
+        var rqLocalData = new Array();
+        var cnt = 0, index = 0, cValue; 
+        
+        for(var key in hdRemoteData) {
+            if(hdRemoteData[key][HoneyCell.FLAG]) {
+                for(var i=1; i<HoneyCell.MAX_NUMBER_OF_MODULES+1; i++) {
+                    if(hdRemoteData[key][i] != null)
+                        cnt += 1;
+                }
+            }
+        }
+        if(cnt == 0) return;
+
+        var buf = new Array();
+        cValue = parseInt((cnt-1)/HoneyCell.MAX_NUMBER_OF_MODULES)+1;
+
+        for(var i=0; i<cValue; i++)
+            buf[i] = [HoneyCell.STX, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, HoneyCell.ETX];
+
+        for(var key in hdRemoteData){
+            if(!hdRemoteData[key][HoneyCell.FLAG])
+                continue;
+            for(var i=1; i<5; i++){
+                if(hdRemoteData[key][i] != null){
+                    var fValue = parseInt(index/HoneyCell.MAX_NUMBER_OF_MODULES),
+                        rValue = index%HoneyCell.MAX_NUMBER_OF_MODULES;
+                    buf[fValue][HoneyCell.TYPE_IDX] |= (msbToLsb2Bit(OutputCMD[key])<<(6-rValue*2)); 
+                    buf[fValue][HoneyCell.IDNO_IDX[rValue]] = lsbToMsb(OutputCMD[key]) + lsb4BitExt(i-1);
+                    buf[fValue][HoneyCell.DATA_IDX[rValue]] = hdRemoteData[key][i];
+                    index += 1;
+                }
+            }
+        }
+
+        for(var i=0; i<cValue; i++){
+            type = buf[i].slice(1, 2);
+            idno = buf[i].slice(2, 6);
+            data = buf[i].slice(6, 10);
+            buf[i][HoneyCell.CRC_IDX] = generateCRC(type, idno, data);
+        }
+
+        if(setZero.set_zero){
+            for(var key in hdRemoteData){
+                hdRemoteData[key] = [false, null, null, null, null];            
+            }
+            lineTracer.flag = false;
+            lineTracer.speed = null;
+            setZero.set_zero = false;
+        } else {
+            for(var key in hdRemoteData)
+                hdRemoteData[key][HoneyCell.FLAG] = false;
+        }
+        
+        for(var i=0; i<cValue; i++){
+            for(var idx in buf[i])
+                rqLocalData.push(buf[i][idx]);
+        }
+
+        if(!(rqLocalData.length%12)) { 
+            console.log(rqLocalData);
+            return rqLocalData;
+        }
+    };
+
+    request = function(sendQueue) {
+        handleRemoteData(sendQueue);
+        var rqValue = requestLocalData();
+        // input function
     };
 
 
@@ -383,14 +521,19 @@
     ext.inputSensor = function(module, index) {
         var key = Object.keys(InputCMD).find(key => InputCMD[key] === module);
         if(key) {
-            return rqRemoteData[module][index-1]; 
+            return rqRemoteData[module][index - 1]; 
         } else {
             return 0;
         }
     };
 
     ext.ledToggle = function(toggle, index) {
+        var sq = { idx: null, led_r: null, led_g: null, led_b: null };
+        sq.idx = index;
 
+        if('ON' == toggle) { sq.led_r = 255; sq.led_g = 255; sq.led_b = 255; }
+        else if('OFF' == toggle) { sq.led_r = 0; sq.led_g = 0; sq.led_b = 0; }
+        request(sq);
     };
 
     ext.led = function(red, green, blue, index) {
