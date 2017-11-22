@@ -288,9 +288,11 @@
             linetracer.threshold[handler.idx] = handler.threshold;
         } else {
             if(handler.hasOwnProperty(HoneyCell.LED_R)) {
+                console.log("enter the led_r");
                 if(hdRemoteData.LED_R[handler.idx]!=handler.value_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
                     hdRemoteData.LED_R[HoneyCell.FLAG] = true;
                     hdRemoteData.LED_R[handler.idx] = handler.value_r;
+                    console.log("input led_r data");
                 }
             }
             if(handler.hasOwnProperty(HoneyCell.LED_G)) {
