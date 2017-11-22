@@ -290,7 +290,6 @@
         } else {
             console.log("enter the else sentense");
             if(handler.hasOwnProperty(HoneyCell.LED_R)) {
-                buf = handler.read(HoneyCell.LED_R);
                 if(hdRemoteData.LED_R[handler.idx]!=handler.value_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
                     hdRemoteData.LED_R[HoneyCell.FLAG] = true;
                     hdRemoteData.LED_R[handler.idx] = handler.value_r;
