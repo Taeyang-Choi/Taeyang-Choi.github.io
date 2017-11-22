@@ -568,8 +568,10 @@
         if(r_spd > 127) { rValue = ((rDir << 7) & 0x80) | 0x7F; }
         else if((r_spd <= 127) && (l_spd >= 0)) { rValue = ((rDir << 7) & 0x80) | (r_spd & 0x7F); }
 
-        sq.lValue = lValue;
-        sq.rValue = rValue;
+        //  temporary change rValue and lValue location
+        sq.lValue = rValue;
+        sq.rValue = lValue;
+
         request(sq);
     };
 
