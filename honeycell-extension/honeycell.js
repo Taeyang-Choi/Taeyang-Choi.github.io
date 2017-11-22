@@ -288,23 +288,22 @@
             linetracer.threshold[handler.idx] = handler.threshold;
         } else {
             if(handler.hasOwnProperty(HoneyCell.LED_R)) {
-                console.log("enter the led_r");
-                if(hdRemoteData.LED_R[handler.idx]!=handler.value_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
+                if(hdRemoteData.LED_R[handler.idx]!=handler.led_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
                     hdRemoteData.LED_R[HoneyCell.FLAG] = true;
-                    hdRemoteData.LED_R[handler.idx] = handler.value_r;
+                    hdRemoteData.LED_R[handler.idx] = handler.led_r;
                     console.log("input led_r data");
                 }
             }
             if(handler.hasOwnProperty(HoneyCell.LED_G)) {
-                if(hdRemoteData.LED_G[handler.idx]!=handler.value_g && (!hdRemoteData.LED_G[HoneyCell.FLAG])) {
+                if(hdRemoteData.LED_G[handler.idx]!=handler.led_g && (!hdRemoteData.LED_G[HoneyCell.FLAG])) {
                     hdRemoteData.LED_G[HoneyCell.FLAG] = true;
-                    hdRemoteData.LED_G[handler.idx] = handler.value_g;
+                    hdRemoteData.LED_G[handler.idx] = handler.led_g;
                 }
             }
             if(handler.hasOwnProperty(HoneyCell.LED_B)) {
-                if(hdRemoteData.LED_B[handler.idx]!=handler.value_b && (!hdRemoteData.LED_B[HoneyCell.FLAG])) {
+                if(hdRemoteData.LED_B[handler.idx]!=handler.led_b && (!hdRemoteData.LED_B[HoneyCell.FLAG])) {
                     hdRemoteData.LED_B[HoneyCell.FLAG] = true;
-                    hdRemoteData.LED_B[handler.idx] = handler.value_b;
+                    hdRemoteData.LED_B[handler.idx] = handler.led_b;
                 }
             }
         }
