@@ -546,7 +546,8 @@
     };
 
     ext.stop = function() {
-
+        var sq = { stop: null };
+        request(sq);
     }
 
     ext.moveDirect = function(dir, spd) {
