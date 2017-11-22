@@ -253,7 +253,6 @@
     };
 
     handleRemoteData = function(handler) {
-        console.log("init handleRemoteData");
         if(handler.hasOwnProperty(HoneyCell.MOVE)) {
             if((hdRemoteData.DC_MOTOR[1]!=handler.fValue || hdRemoteData.DC_MOTOR[2]!=handler.bValue) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
@@ -288,12 +287,10 @@
         } else if(handler.hasOwnProperty(HoneyCell.THRESHOLD)) {
             linetracer.threshold[handler.idx] = handler.threshold;
         } else {
-            console.log("enter the else sentense");
             if(handler.hasOwnProperty(HoneyCell.LED_R)) {
                 if(hdRemoteData.LED_R[handler.idx]!=handler.value_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
                     hdRemoteData.LED_R[HoneyCell.FLAG] = true;
                     hdRemoteData.LED_R[handler.idx] = handler.value_r;
-                    console.log("input led_r data");
                 }
             }
             if(handler.hasOwnProperty(HoneyCell.LED_G)) {
@@ -309,11 +306,9 @@
                 }
             }
         }
-        console.log("before linetracer");
         if(linetracer.flag) {
             lineTracer();
         }
-        console.log("before setzero");
         if(handler.hasOwnProperty(HoneyCell.SET_ZERO)) { // Always footer position in handleRemoteData function
             if(handler.flag){
                 setZero.set_zero = true;
@@ -322,13 +317,13 @@
                     hdRemoteData[key] = [true, 0, 0, 0, 0]; 
             }       
         }
-        console.log("end of handleRemoteData function");
     };
 
     requestLocalData = function() {
+console.log("1");        
         var rqLocalData = new Array();
         var cnt = 0, index = 0, cValue; 
-        
+console.log("2");
         for(var key in hdRemoteData) {
             if(hdRemoteData[key][HoneyCell.FLAG]) {
                 for(var i=1; i<HoneyCell.MAX_NUMBER_OF_MODULES+1; i++) {
@@ -338,13 +333,13 @@
             }
         }
         if(cnt == 0) return;
-
+console.log("3");
         var buf = new Array();
         cValue = parseInt((cnt-1)/HoneyCell.MAX_NUMBER_OF_MODULES)+1;
 
         for(var i=0; i<cValue; i++)
             buf[i] = [HoneyCell.STX, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, HoneyCell.ETX];
-
+console.log("4");
         for(var key in hdRemoteData){
             if(!hdRemoteData[key][HoneyCell.FLAG])
                 continue;
@@ -359,14 +354,14 @@
                 }
             }
         }
-
+console.log("5");
         for(var i=0; i<cValue; i++){
             type = buf[i].slice(1, 2);
             idno = buf[i].slice(2, 6);
             data = buf[i].slice(6, 10);
             buf[i][HoneyCell.CRC_IDX] = generateCRC(type, idno, data);
         }
-
+console.log("6");
         if(setZero.set_zero){
             for(var key in hdRemoteData){
                 hdRemoteData[key] = [false, null, null, null, null];            
@@ -378,21 +373,21 @@
             for(var key in hdRemoteData)
                 hdRemoteData[key][HoneyCell.FLAG] = false;
         }
-        
+console.log("7");        
         for(var i=0; i<cValue; i++){
             for(var idx in buf[i])
                 rqLocalData.push(buf[i][idx]);
         }
-
+console.log("8");
         if(!(rqLocalData.length%12)) { 
             console.log(rqLocalData);
             return rqLocalData;
         }
+console.log("9");
     };
 
     request = function(sendQueue) {
         handleRemoteData(sendQueue);
-        console.log("execute requestLocalData function");
         var rqValue = requestLocalData();
         
     };
