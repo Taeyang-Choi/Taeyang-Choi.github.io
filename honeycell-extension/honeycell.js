@@ -388,9 +388,11 @@
     };
 
     request = function(sendQueue) {
+        console.log("execute handleRemoteData function");
         handleRemoteData(sendQueue);
+        console.log("execute requestLocalData function");
         var rqValue = requestLocalData();
-        // input function
+        
     };
 
 
@@ -470,8 +472,8 @@
             initFlag = true;
         } else {
             rawData = new Uint8Array(data);
-            //handleLocalData(rawData);
-            //requestRemoteData();
+            handleLocalData(rawData);
+            requestRemoteData();
             pinging = false;
             pingCount = 0;
         }
@@ -531,6 +533,7 @@
 
         if('ON' == toggle) { sq.led_r = 255; sq.led_g = 255; sq.led_b = 255; }
         else if('OFF' == toggle) { sq.led_r = 0; sq.led_g = 0; sq.led_b = 0; }
+        console.log(sq);
         request(sq);
     };
 
