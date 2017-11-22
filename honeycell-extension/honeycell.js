@@ -252,7 +252,7 @@
         }
     };
 
-    Module.prototype.handleRemoteData = function(handler) {
+    handleRemoteData = function(handler) {
         if(handler.hasOwnProperty(HoneyCell.MOVE)) {
             if((hdRemoteData.DC_MOTOR[1]!=handler.fValue || hdRemoteData.DC_MOTOR[2]!=handler.bValue) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
