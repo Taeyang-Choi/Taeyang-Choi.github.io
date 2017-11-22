@@ -151,15 +151,15 @@
     };
 
     lineTracer = function() {
-        var fValue, bValue;
+        var lValue, rValue;
         var pLeft, pRight;
 
         if(linetracer.speed > 127) {
-            fValue = 0x7F;
-            bValue = 0xFF;
+            lValue = 0x7F;
+            rValue = 0xFF;
         } else if((linetracer.speed <= 127) && (linetracer.speed >= 0)) {
-            fValue = linetracer.speed & 0x7F;
-            bValue = 0x80 | (linetracer.speed & 0x7F);
+            lValue = linetracer.speed & 0x7F;
+            rValue = 0x80 | (linetracer.speed & 0x7F);
         }
 
         pLeft = rqRemoteData.PSD[0];
@@ -167,24 +167,24 @@
 
         if(pLeft > linetracer.threshold[0]) {
             if(pRight > linetracer.threshold[1]) {
-                if(!(hdRemoteData.DC_MOTOR[1] == bValue && hdRemoteData.DC_MOTOR[2] == fValue)) {
+                if(!(hdRemoteData.DC_MOTOR[1] == rValue && hdRemoteData.DC_MOTOR[2] == lValue)) {
                     hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                    hdRemoteData.DC_MOTOR[1] = bValue;
-                    hdRemoteData.DC_MOTOR[2] = fValue;              
+                    hdRemoteData.DC_MOTOR[1] = rValue;
+                    hdRemoteData.DC_MOTOR[2] = lValue;              
                 }
             } else {
-                if(!(hdRemoteData.DC_MOTOR[1] == bValue && hdRemoteData.DC_MOTOR[2] == 0)) {
+                if(!(hdRemoteData.DC_MOTOR[1] == rValue && hdRemoteData.DC_MOTOR[2] == 0)) {
                     hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                    hdRemoteData.DC_MOTOR[1] = bValue;
+                    hdRemoteData.DC_MOTOR[1] = rValue;
                     hdRemoteData.DC_MOTOR[2] = 0;
                 }
             }
         } else {
             if(pRight > linetracer.threshold[1]) {
-                if(!(hdRemoteData.DC_MOTOR[1] == 0 && hdRemoteData.DC_MOTOR[2] == fValue)) {
+                if(!(hdRemoteData.DC_MOTOR[1] == 0 && hdRemoteData.DC_MOTOR[2] == lValue)) {
                     hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
                     hdRemoteData.DC_MOTOR[1] = 0;
-                    hdRemoteData.DC_MOTOR[2] = fValue;              
+                    hdRemoteData.DC_MOTOR[2] = lValue;              
                 }
             } else {
                 if(!(hdRemoteData.DC_MOTOR[1] == 0 && hdRemoteData.DC_MOTOR[2] == 0)) {
@@ -254,10 +254,10 @@
 
     handleRemoteData = function(handler) {
         if(handler.hasOwnProperty(HoneyCell.MOVE)) {
-            if((hdRemoteData.DC_MOTOR[1]!=handler.fValue || hdRemoteData.DC_MOTOR[2]!=handler.bValue) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
+            if((hdRemoteData.DC_MOTOR[1]!=handler.lValue || hdRemoteData.DC_MOTOR[2]!=handler.rValue) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                hdRemoteData.DC_MOTOR[1] = handler.fValue;
-                hdRemoteData.DC_MOTOR[2] = handler.bValue;
+                hdRemoteData.DC_MOTOR[1] = handler.lValue;
+                hdRemoteData.DC_MOTOR[2] = handler.rValue;
             }
         } else if(handler.hasOwnProperty(HoneyCell.STOP) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
             if(hdRemoteData.DC_MOTOR[1]!=0 || hdRemoteData.DC_MOTOR[2]!=0 || hdRemoteData.DC_MOTOR[3]!=0 || hdRemoteData.DC_MOTOR[4]!=0) {
@@ -291,7 +291,6 @@
                 if(hdRemoteData.LED_R[handler.idx]!=handler.led_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
                     hdRemoteData.LED_R[HoneyCell.FLAG] = true;
                     hdRemoteData.LED_R[handler.idx] = handler.led_r;
-                    console.log("input led_r data");
                 }
             }
             if(handler.hasOwnProperty(HoneyCell.LED_G)) {
@@ -320,12 +319,9 @@
         }
     };
 
-    requestLocalData = function() {
-console.log("1");        
+    requestLocalData = function() {     
         var rqLocalData = new Array();
         var cnt = 0, index = 0, cValue; 
-console.log("2");
-console.log(hdRemoteData.LED_R[HoneyCell.FLAG]);
         for(var key in hdRemoteData) {
             if(hdRemoteData[key][HoneyCell.FLAG]) {
                 for(var i=1; i<HoneyCell.MAX_NUMBER_OF_MODULES+1; i++) {
@@ -335,13 +331,13 @@ console.log(hdRemoteData.LED_R[HoneyCell.FLAG]);
             }
         }
         if(cnt == 0) return;
-console.log("3");
+
         var buf = new Array();
         cValue = parseInt((cnt-1)/HoneyCell.MAX_NUMBER_OF_MODULES)+1;
 
         for(var i=0; i<cValue; i++)
             buf[i] = [HoneyCell.STX, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, HoneyCell.ETX];
-console.log("4");
+
         for(var key in hdRemoteData){
             if(!hdRemoteData[key][HoneyCell.FLAG])
                 continue;
@@ -356,14 +352,14 @@ console.log("4");
                 }
             }
         }
-console.log("5");
+
         for(var i=0; i<cValue; i++){
             type = buf[i].slice(1, 2);
             idno = buf[i].slice(2, 6);
             data = buf[i].slice(6, 10);
             buf[i][HoneyCell.CRC_IDX] = generateCRC(type, idno, data);
         }
-console.log("6");
+
         if(setZero.set_zero){
             for(var key in hdRemoteData){
                 hdRemoteData[key] = [false, null, null, null, null];            
@@ -375,23 +371,25 @@ console.log("6");
             for(var key in hdRemoteData)
                 hdRemoteData[key][HoneyCell.FLAG] = false;
         }
-console.log("7");        
+     
         for(var i=0; i<cValue; i++){
             for(var idx in buf[i])
                 rqLocalData.push(buf[i][idx]);
         }
-console.log("8");
+
         if(!(rqLocalData.length%12)) { 
             console.log(rqLocalData);
             return rqLocalData;
         }
-console.log("9");
     };
 
     request = function(sendQueue) {
         handleRemoteData(sendQueue);
         var rqValue = requestLocalData();
-        
+        if(rqValue) {
+            var sd = new Uint8Array(rqValue);
+            device.send(sd.buffer);
+        }
     };
 
 
@@ -556,7 +554,22 @@ console.log("9");
     };
 
     ext.move = function(l_dir, l_spd, r_dir, r_spd) {
+        var lDir, rDir, lValue, rValue;
+        var sq = { move: null, lValue: null, rValue:null }
 
+        if(l_dir == 'clockwise') { lDir = 0; }
+        else if(l_dir == 'counterclockwise') { lDir = 1; }
+        if(r_dir == 'clockwise') { rDir = 0; }
+        else if(r_dir == 'counterclockwise') { rDir = 1; }
+
+        if(l_spd > 127) { lValue = ((lDir << 7) & 0x80) | 0x7F; }
+        else if((l_spd <= 127) && (l_spd >= 0)) { lValue = ((lDir << 7) & 0x80) | (l_spd & 0x7F); }
+        if(r_spd > 127) { rValue = ((rDir << 7) & 0x80) | 0x7F; }
+        else if((r_spd <= 127) && (l_spd >= 0)) { rValue = ((rDir << 7) & 0x80) | (r_spd & 0x7F); }
+
+        sq.lValue = lValue;
+        sq.rValue = rValue;
+        request(sq);
     };
 
     ext.buzzer = function(hz, index) {
