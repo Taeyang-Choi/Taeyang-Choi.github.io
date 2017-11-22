@@ -470,10 +470,8 @@
             initFlag = true;
         } else {
             rawData = new Uint8Array(data);
-            //console.log(typeof rawData);
-            handleLocalData(rawData);
-            requestRemoteData();
-            //console.log(rawData);
+            //handleLocalData(rawData);
+            //requestRemoteData();
             pinging = false;
             pingCount = 0;
         }
