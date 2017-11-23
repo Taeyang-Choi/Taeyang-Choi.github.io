@@ -671,7 +671,9 @@
             [' ', 'Mobile Robot move %m.directs at %n speed', 'moveDirect', 'forward', 100],
             [' ', 'Mobile Robot left wheel %m.dcmotor at %n speed right wheel %m.dcmotor at %n speed', 'move', 'clockwise', 100, 'counterclockwise', 100],
             [' ', 'Buzzer %n Hz No: %m.index', 'buzzer', 250, 1],
-            [' ', '7Segment Value: %m.sevensegment No: %m.index', 'sevenSegment', 1, 1]
+            [' ', '7Segment Value: %m.sevensegment No: %m.index', 'sevenSegment', 1, 1],
+            [' ', 'LineTracer: Move along the line at %n speed', 'doLinetracer', 80],
+            [' ', 'LineTracer: Change the value of the %m.linetracerSensors sensor to %n', 'changeThreshold', 'left', 80]
         ],
         ko: [
             ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1],
@@ -686,7 +688,9 @@
             [' ', '모바일로봇 %m.directs 으로 움직이기 속도: %n', 'moveDirect', '앞', 100],
             [' ', '모바일로봇 왼쪽바퀴 %m.dcmotor 속도: %n 오른쪽바퀴: %m.dcmotor 속도: %n ', 'move', 'clockwise', 100, 'counterclockwise', 100],
             [' ', '부저 %n Hz 번호: %m.index', 'buzzer', 250, 1],
-            [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1]
+            [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1],
+            [' ', '라인트레이서 %n 의 속도로 움직이기', 'doLinetracer', 80],
+            [' ', '라인트레이서 %m.linetracerSensors 센서 역치값 %n 으로 변경하기', 'changeThreshold', 'left', 80]
         ]
     };
 
@@ -700,7 +704,8 @@
             ledtoggle: ['ON', 'OFF'],
             dcmotor: ['clockwise', 'counterclockwise'],
             directs: ['forward', 'backward', 'left', 'right'],
-            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            linetraerSensors: ['left', 'right']
         },
         ko: {
             index: [1, 2, 3, 4],
@@ -711,7 +716,8 @@
             ledtoggle: ['켜기', '끄기'],
             dcmotor: ['시계방향', '반시계방향'],
             directs: ['앞', '뒤', '왼쪽', '오른쪽'],
-            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            linetraerSensors: ['왼쪽', '오른쪽']
         }
     }
 
