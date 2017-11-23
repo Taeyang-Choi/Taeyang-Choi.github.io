@@ -270,19 +270,19 @@
             linetracer.flag = true;
             linetracer.speed = handler.speed;
         } else if(handler.hasOwnProperty(HoneyCell.DC_MOTOR)) {
-            if(hdRemoteData.DC_MOTOR[handler.idx]!=handler.value && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
+            if(hdRemoteData.DC_MOTOR[handler.idx]!=handler.dc_motor && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                hdRemoteData.DC_MOTOR[handler.idx] = handler.value;
+                hdRemoteData.DC_MOTOR[handler.idx] = handler.dc_motor;
             }
         } else if(handler.hasOwnProperty(HoneyCell.BUZZER)) {
-            if(hdRemoteData.BUZZER[handler.idx]!=handler.value && (!hdRemoteData.BUZZER[HoneyCell.FLAG])) {
+            if(hdRemoteData.BUZZER[handler.idx]!=handler.buzzer && (!hdRemoteData.BUZZER[HoneyCell.FLAG])) {
                 hdRemoteData.BUZZER[HoneyCell.FLAG] = true;
-                hdRemoteData.BUZZER[handler.idx] = handler.value;   
+                hdRemoteData.BUZZER[handler.idx] = handler.buzzer;   
             }
         } else if(handler.hasOwnProperty(HoneyCell.SEVEN_SEGMENT)) {
-            if(hdRemoteData.SEVEN_SEGMENT[handler.idx]!=handler.value && (!hdRemoteData.SEVEN_SEGMENT[HoneyCell.FLAG])) {
+            if(hdRemoteData.SEVEN_SEGMENT[handler.idx]!=handler.seven_segment && (!hdRemoteData.SEVEN_SEGMENT[HoneyCell.FLAG])) {
                 hdRemoteData.SEVEN_SEGMENT[HoneyCell.FLAG] = true;
-                hdRemoteData.SEVEN_SEGMENT[handler.idx] = handler.value;    
+                hdRemoteData.SEVEN_SEGMENT[handler.idx] = handler.seven_segment;    
             }
         } else if(handler.hasOwnProperty(HoneyCell.THRESHOLD)) {
             linetracer.threshold[handler.idx] = handler.threshold;
@@ -507,14 +507,6 @@
         device = null;
     };
 
-    ext.wait_random = function(callback) {
-        wait = Math.random();
-        console.log('Waiting for ' + wait + ' seconds');
-        window.setTimeout(function() {
-            callback();
-        }, wait*1000);
-    };
-
     ext.inputSensor = function(module, index) {
         var key = Object.keys(InputCMD).find(key => InputCMD[key] === module);
         if(key) {
@@ -530,19 +522,50 @@
 
         if('ON' == toggle) { sq.led_r = 255; sq.led_g = 255; sq.led_b = 255; }
         else if('OFF' == toggle) { sq.led_r = 0; sq.led_g = 0; sq.led_b = 0; }
+        
         request(sq);
     };
 
     ext.led = function(red, green, blue, index) {
+        var sq = { idx: null, led_r: null, led_g: null, led_b: null };
+        sq.idx = index;
 
+        if('ON' == red) { sq.led_r = 255; }
+        else if('OFF' == red) { sq.led_r = 0; }
+
+        if('ON' == green) { sq.led_g = 255; }
+        else if('OFF' == green) { sq.led_g = 0; }
+
+        if('ON' == blue) { sq.led_b = 255; }
+        else if('OFF' == blue) { sq.led_b = 0; }
+
+        request(sq);
     };
 
     ext.ledPwm = function(red, green, blue, index) {
+        var sq = { idx: null, led_r: null, led_g: null, led_b: null };
+        sq.idx = index;
 
+        sq.led_r = red;
+        sq.led_g = green;
+        sq.led_b = blue;
+
+        request(sq);
     };
 
-    ext.dcMotor = function(dir, spd, index) {
+    ext.dcMotor = function(_dir, spd, index) {
+        var sq = { idx: null, dc_motor: null };
+        var dir, value;
+        sq.idx = index;
 
+        if(_dir == 'clockwise') { dir = 0; }
+        else if(_dir == 'counterclockwise') { dir = 1; }
+
+        if(spd > 127) { value = ((dir << 7) & 0x80) | 0x7F; }
+        else if((spd <= 127) && (spd >= 0)) { value = ((dir << 7) & 0x80) | (spd & 0x7F); }
+
+        sq.dc_motor = value;
+        request(sq);
     };
 
     ext.stop = function() {
@@ -550,23 +573,55 @@
         request(sq);
     }
 
-    ext.moveDirect = function(dir, spd) {
+    ext.moveDirect = function(__dir, spd) {
+        var sq = { move: null, lValue: null, rValue: null };
+        var _dir, dir, lValue, rValue;
 
+        if(__dir == 'forward') { _dir = 0; }
+        else if(__dir == 'backward') { _dir = 1; }
+        else if(__dir == 'left') { _dir = 2; }
+        else if(__dir == 'right') { _dir = 3; }
+
+        dir = (_dir == 1) 1 : 0;
+
+        if(spd > 127) { 
+            lValue = ((dir << 7) & 0x80) | 0x7F;
+            rValue = ((~dir << 7) & 0x80) | 0x7F;
+        }
+        else if((spd <= 127) && (spd >= 0)) { 
+            lValue = ((dir << 7) & 0x80) | (spd & 0x7F);
+            rValue = ((~dir << 7) & 0x80) | (spd & 0x7F); 
+        }
+
+        //  temporary change rValue and lValue location
+        if(_dir == 0 || _dir == 1) {
+            sq.lValue = rValue;
+            sq.rValue = lValue;
+        } else if(_dir == 2) {
+            sq.lValue = rValue;
+            sq.rValue = 0;
+
+        } else if(_dir == 3) {
+            sq.lValue = 0;
+            sq.rValue = lValue;
+        }
+
+        request(sq);
     };
 
-    ext.move = function(l_dir, l_spd, r_dir, r_spd) {
-        var lDir, rDir, lValue, rValue;
+    ext.move = function(_l_dir, l_spd, _r_dir, r_spd) {
+        var l_dir, r_dir, lValue, rValue;
         var sq = { move: null, lValue: null, rValue:null }
 
-        if(l_dir == 'clockwise') { lDir = 0; }
-        else if(l_dir == 'counterclockwise') { lDir = 1; }
-        if(r_dir == 'clockwise') { rDir = 0; }
-        else if(r_dir == 'counterclockwise') { rDir = 1; }
+        if(_l_dir == 'clockwise') { l_dir = 0; }
+        else if(_l_dir == 'counterclockwise') { l_dir = 1; }
+        if(_r_dir == 'clockwise') { r_dir = 0; }
+        else if(_r_dir == 'counterclockwise') { r_dir = 1; }
 
-        if(l_spd > 127) { lValue = ((lDir << 7) & 0x80) | 0x7F; }
-        else if((l_spd <= 127) && (l_spd >= 0)) { lValue = ((lDir << 7) & 0x80) | (l_spd & 0x7F); }
-        if(r_spd > 127) { rValue = ((rDir << 7) & 0x80) | 0x7F; }
-        else if((r_spd <= 127) && (l_spd >= 0)) { rValue = ((rDir << 7) & 0x80) | (r_spd & 0x7F); }
+        if(l_spd > 127) { lValue = ((l_dir << 7) & 0x80) | 0x7F; }
+        else if((l_spd <= 127) && (l_spd >= 0)) { lValue = ((l_dir << 7) & 0x80) | (l_spd & 0x7F); }
+        if(r_spd > 127) { rValue = ((r_dir << 7) & 0x80) | 0x7F; }
+        else if((r_spd <= 127) && (l_spd >= 0)) { rValue = ((r_dir << 7) & 0x80) | (r_spd & 0x7F); }
 
         //  temporary change rValue and lValue location
         sq.lValue = rValue;
@@ -576,11 +631,21 @@
     };
 
     ext.buzzer = function(hz, index) {
+        var sq = { idx: null, buzzer: null };
 
+        sq.idx = index;
+        sq.buzzer = hz;
+
+        request(sq);
     };
 
     ext.sevenSegment = function(value, index) {
+        var sq = { idx: null, seven_segment: null };
 
+        sq.idx = index;
+        sq.seven_segment = value;
+
+        request(sq);
     };
 
     var paramString = window.location.search.replace(/^\?|\/$/g, '');
