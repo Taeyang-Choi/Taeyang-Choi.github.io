@@ -694,7 +694,7 @@
             [' ', 'DC 모터 방향 %m.dcmotor 속도: %n 번호: %m.index', 'dcMotor', '시계방향', 100, 1],
             [' ', '모든 DC모터 정지하기', 'stop'],
             [' ', '모바일로봇 %m.directs 으로 움직이기 속도: %n', 'moveDirect', '앞', 100],
-            [' ', '모바일로봇 왼쪽바퀴 %m.dcmotor 속도: %n 오른쪽바퀴: %m.dcmotor 속도: %n ', 'move', '시게방향', 100, '반시계방향', 100],
+            [' ', '모바일로봇 왼쪽바퀴 %m.dcmotor 속도: %n 오른쪽바퀴: %m.dcmotor 속도: %n ', 'move', '시계방향', 100, '반시계방향', 100],
             [' ', '부저 %n Hz 번호: %m.index', 'buzzer', 250, 1],
             [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1],
             [' ', '라인트레이서 %n 의 속도로 움직이기', 'doLinetracer', 80],
@@ -724,8 +724,7 @@
             ledtoggle: ['켜기', '끄기'],
             dcmotor: ['시계방향', '반시계방향'],
             directs: ['앞', '뒤', '왼쪽', '오른쪽'],
-            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            linetracerSensors: ['왼쪽', '오른쪽']
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         }
     }
 
