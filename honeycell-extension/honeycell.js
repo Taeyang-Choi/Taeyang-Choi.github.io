@@ -582,7 +582,7 @@
         else if(__dir == 'left') { _dir = 2; }
         else if(__dir == 'right') { _dir = 3; }
 
-        dir = (_dir == 1) 1 : 0;
+        dir = ((_dir == 1) 1 : 0);
 
         if(spd > 127) { 
             lValue = ((dir << 7) & 0x80) | 0x7F;
