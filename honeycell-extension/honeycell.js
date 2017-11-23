@@ -648,6 +648,14 @@
         request(sq);
     };
 
+    ext.doLinetracer = function(spd) {
+
+    }
+
+    ext.changeThreshold = function() {
+
+    }
+
     var paramString = window.location.search.replace(/^\?|\/$/g, '');
     var vars = paramString.split("&");
     var lang = 'en';
@@ -673,7 +681,7 @@
             [' ', 'Buzzer %n Hz No: %m.index', 'buzzer', 250, 1],
             [' ', '7Segment Value: %m.sevensegment No: %m.index', 'sevenSegment', 1, 1],
             [' ', 'LineTracer: Move along the line at %n speed', 'doLinetracer', 80],
-            [' ', 'LineTracer: Change the value of the %m.linetracerSensors sensor to %n', 'changeThreshold', 'left', 80]
+            [' ', 'LineTracer: Change the value of the %m.linetracerSensors sensor to %n', 'changeThreshold', 'left', 130]
         ],
         ko: [
             ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1],
@@ -690,7 +698,7 @@
             [' ', '부저 %n Hz 번호: %m.index', 'buzzer', 250, 1],
             [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1],
             [' ', '라인트레이서 %n 의 속도로 움직이기', 'doLinetracer', 80],
-            [' ', '라인트레이서 %m.linetracerSensors 센서 역치값 %n 으로 변경하기', 'changeThreshold', 'left', 80]
+            [' ', '라인트레이서 %m.linetracerSensors 센서 역치값 %n 으로 변경하기', 'changeThreshold', 'left', 130]
         ]
     };
 
