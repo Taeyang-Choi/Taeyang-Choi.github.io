@@ -713,7 +713,7 @@
             dcmotor: ['clockwise', 'counterclockwise'],
             directs: ['forward', 'backward', 'left', 'right'],
             sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            linetraerSensors: ['left', 'right']
+            linetracerSensors: ['left', 'right']
         },
         ko: {
             index: [1, 2, 3, 4],
@@ -725,7 +725,7 @@
             dcmotor: ['시계방향', '반시계방향'],
             directs: ['앞', '뒤', '왼쪽', '오른쪽'],
             sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            linetraerSensors: ['왼쪽', '오른쪽']
+            linetracerSensors: ['왼쪽', '오른쪽']
         }
     }
 
