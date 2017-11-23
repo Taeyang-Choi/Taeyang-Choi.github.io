@@ -681,7 +681,7 @@
             [' ', 'Buzzer %n Hz No: %m.index', 'buzzer', 250, 1],
             [' ', '7Segment Value: %m.sevensegment No: %m.index', 'sevenSegment', 1, 1],
             [' ', 'LineTracer: Move along the line at %n speed', 'doLinetracer', 80],
-            [' ', 'LineTracer: Change the value of the %m.linetracerSensors sensor to %n', 'changeThreshold', 'left', 130]
+            [' ', 'LineTracer: Change the value of the %m.linetracerSensors sensor to %n', 'changeThreshold', 'right', 130]
         ],
         ko: [
             ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1],
@@ -724,7 +724,8 @@
             ledtoggle: ['켜기', '끄기'],
             dcmotor: ['시계방향', '반시계방향'],
             directs: ['앞', '뒤', '왼쪽', '오른쪽'],
-            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            linetracerSensors: ['왼쪽', '오른쪽']
         }
     }
 
