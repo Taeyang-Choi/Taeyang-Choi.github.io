@@ -694,11 +694,11 @@
             [' ', 'DC 모터 방향 %m.dcmotor 속도: %n 번호: %m.index', 'dcMotor', '시계방향', 100, 1],
             [' ', '모든 DC모터 정지하기', 'stop'],
             [' ', '모바일로봇 %m.directs 으로 움직이기 속도: %n', 'moveDirect', '앞', 100],
-            [' ', '모바일로봇 왼쪽바퀴 %m.dcmotor 속도: %n 오른쪽바퀴: %m.dcmotor 속도: %n ', 'move', 'clockwise', 100, 'counterclockwise', 100],
+            [' ', '모바일로봇 왼쪽바퀴 %m.dcmotor 속도: %n 오른쪽바퀴: %m.dcmotor 속도: %n ', 'move', '시게방향', 100, '반시계방향', 100],
             [' ', '부저 %n Hz 번호: %m.index', 'buzzer', 250, 1],
             [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1],
             [' ', '라인트레이서 %n 의 속도로 움직이기', 'doLinetracer', 80],
-            [' ', '라인트레이서 %m.linetracerSensors 센서 역치값 %n 으로 변경하기', 'changeThreshold', 'left', 130]
+            [' ', '라인트레이서 %m.linetracerSensors 센서 역치값 %n 으로 변경하기', 'changeThreshold', '왼쪽', 130]
         ]
     };
 
