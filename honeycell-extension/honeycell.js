@@ -268,7 +268,7 @@
             }
         }  else if(handler.hasOwnProperty(HoneyCell.LINE_TRACER) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
             linetracer.flag = true;
-            linetracer.speed = handler.speed;
+            linetracer.speed = handler.line_tracer;
         } else if(handler.hasOwnProperty(HoneyCell.DC_MOTOR)) {
             if(hdRemoteData.DC_MOTOR[handler.idx]!=handler.dc_motor && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
@@ -649,11 +649,20 @@
     };
 
     ext.doLinetracer = function(spd) {
+        var sq = { line_tracer: null };
+        sq.line_tracer = spd;
 
+        request(sq);
     }
 
-    ext.changeThreshold = function() {
+    ext.changeThreshold = function(sensor, value) {
+        var sq = { idx: null, threshold: null };
+        if(sensor == "left sensor") { sq.idx = 0; } 
+        else if(sensor == "right sensor") { sq.idx = 1; }
 
+        sq.threshold = value;
+
+        request(sq);
     }
 
     var paramString = window.location.search.replace(/^\?|\/$/g, '');
@@ -681,7 +690,7 @@
             [' ', 'Buzzer %n Hz No: %m.index', 'buzzer', 250, 1],
             [' ', '7Segment Value: %m.sevensegment No: %m.index', 'sevenSegment', 1, 1],
             [' ', 'LineTracer: Move along the line at %n speed', 'doLinetracer', 80],
-            [' ', 'LineTracer: Change the value of the %m.linetracerSensors to %n', 'changeThreshold', 'Left Sensor', 130]
+            [' ', 'LineTracer: Change the value of the %m.linetracerSensors to %n', 'changeThreshold', 'left sensor', 130]
         ],
         ko: [
             ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1],
@@ -698,7 +707,7 @@
             [' ', '부저 %n Hz 번호: %m.index', 'buzzer', 250, 1],
             [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1],
             [' ', '라인트레이서 %n 의 속도로 움직이기', 'doLinetracer', 80],
-            [' ', '라인트레이서 %m.linetracerSensors 역치값 %n 으로 변경하기', 'changeThreshold', '왼쪽 센서', 130]
+            [' ', '라인트레이서 %m.linetracerSensors 역치값 %n 으로 변경하기', 'changeThreshold', '왼쪽센서', 130]
         ]
     };
 
@@ -713,7 +722,7 @@
             dcmotor: ['clockwise', 'counterclockwise'],
             directs: ['forward', 'backward', 'left', 'right'],
             sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            linetracerSensors: ['Left Sensor', 'Right Sensor']
+            linetracerSensors: ['left sensor', 'right sensor']
         },
         ko: {
             index: [1, 2, 3, 4],
