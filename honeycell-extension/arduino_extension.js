@@ -494,6 +494,7 @@
   var potentialDevices = [];
   ext._deviceConnected = function(dev) {
     potentialDevices.push(dev);
+    console.log("call _deviceConnected!!");
     if (!device)
       tryNextDevice();
   };
