@@ -43,11 +43,6 @@
     };
 
     var receiveData = [];
-    var linetracer = {
-        flag: false,
-        speed: null,
-        threshold: [120, 120]
-    };
 
     var HoneyCell = {
         // index table
@@ -150,52 +145,6 @@
         return result;
     };
 
-    lineTracer = function() {
-        var lValue, rValue;
-        var pLeft, pRight;
-
-        if(linetracer.speed > 127) {
-            lValue = 0x7F;
-            rValue = 0xFF;
-        } else if((linetracer.speed <= 127) && (linetracer.speed >= 0)) {
-            lValue = linetracer.speed & 0x7F;
-            rValue = 0x80 | (linetracer.speed & 0x7F);
-        }
-
-        pLeft = rqRemoteData.PSD[0];
-        pRight = rqRemoteData.PSD[1];
-
-        if(pLeft > linetracer.threshold[0]) {
-            if(pRight > linetracer.threshold[1]) {
-                if(!(hdRemoteData.DC_MOTOR[1] == rValue && hdRemoteData.DC_MOTOR[2] == lValue)) {
-                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                    hdRemoteData.DC_MOTOR[1] = rValue;
-                    hdRemoteData.DC_MOTOR[2] = lValue;              
-                }
-            } else {
-                if(!(hdRemoteData.DC_MOTOR[1] == rValue && hdRemoteData.DC_MOTOR[2] == 0)) {
-                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                    hdRemoteData.DC_MOTOR[1] = rValue;
-                    hdRemoteData.DC_MOTOR[2] = 0;
-                }
-            }
-        } else {
-            if(pRight > linetracer.threshold[1]) {
-                if(!(hdRemoteData.DC_MOTOR[1] == 0 && hdRemoteData.DC_MOTOR[2] == lValue)) {
-                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                    hdRemoteData.DC_MOTOR[1] = 0;
-                    hdRemoteData.DC_MOTOR[2] = lValue;              
-                }
-            } else {
-                if(!(hdRemoteData.DC_MOTOR[1] == 0 && hdRemoteData.DC_MOTOR[2] == 0)) {
-                    hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
-                    hdRemoteData.DC_MOTOR[1] = 0;
-                    hdRemoteData.DC_MOTOR[2] = 0;           
-                }
-            }
-        }
-    };
-
     handleLocalData = function(data) {
         data.forEach(function(element) {
             receiveData.push(element);
@@ -266,9 +215,6 @@
                     hdRemoteData.DC_MOTOR[i+1] = 0;
                 linetracer.flag = false;
             }
-        }  else if(handler.hasOwnProperty(HoneyCell.LINE_TRACER) && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
-            linetracer.flag = true;
-            linetracer.speed = handler.line_tracer;
         } else if(handler.hasOwnProperty(HoneyCell.DC_MOTOR)) {
             if(hdRemoteData.DC_MOTOR[handler.idx]!=handler.dc_motor && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
@@ -284,8 +230,6 @@
                 hdRemoteData.SEVEN_SEGMENT[HoneyCell.FLAG] = true;
                 hdRemoteData.SEVEN_SEGMENT[handler.idx] = handler.seven_segment;    
             }
-        } else if(handler.hasOwnProperty(HoneyCell.THRESHOLD)) {
-            linetracer.threshold[handler.idx] = handler.threshold;
         } else {
             if(handler.hasOwnProperty(HoneyCell.LED_R)) {
                 if(hdRemoteData.LED_R[handler.idx]!=handler.led_r && (!hdRemoteData.LED_R[HoneyCell.FLAG])) {
@@ -305,9 +249,6 @@
                     hdRemoteData.LED_B[handler.idx] = handler.led_b;
                 }
             }
-        }
-        if(linetracer.flag) {
-            lineTracer();
         }
         if(handler.hasOwnProperty(HoneyCell.SET_ZERO)) { // Always footer position in handleRemoteData function
             if(handler.flag){
@@ -444,14 +385,14 @@
         });
 
         watchdog = setTimeout(function() {
-            clearInterval(poller);
+            if(poller) clearInterval(poller);
             if(connected) connected = false;
             poller = null;
             device.set_receive_handler(null);
             device.close();
             device = null;
             tryNextDevice();
-        }, 2500); 
+        }, 5000); 
     }
 
     var initFlag = false;
@@ -498,7 +439,7 @@
             }
             pinging = true;
         }
-        }, 100);
+        }, 50);
     }
 
     ext._shutdown = function() {
@@ -648,23 +589,6 @@
         request(sq);
     };
 
-    ext.doLinetracer = function(spd) {
-        var sq = { line_tracer: null };
-        sq.line_tracer = spd;
-
-        request(sq);
-    }
-
-    ext.changeThreshold = function(sensor, value) {
-        var sq = { idx: null, threshold: null };
-        if(sensor == "left sensor") { sq.idx = 0; } 
-        else if(sensor == "right sensor") { sq.idx = 1; }
-
-        sq.threshold = value;
-
-        request(sq);
-    }
-
     var paramString = window.location.search.replace(/^\?|\/$/g, '');
     var vars = paramString.split("&");
     var lang = 'en';
@@ -688,9 +612,7 @@
             [' ', 'Mobile Robot move %m.directs at %n speed', 'moveDirect', 'forward', 100],
             [' ', 'Mobile Robot left wheel %m.dcmotor at %n speed right wheel %m.dcmotor at %n speed', 'move', 'clockwise', 100, 'counterclockwise', 100],
             [' ', 'Buzzer %n Hz No: %m.index', 'buzzer', 250, 1],
-            [' ', '7Segment Value: %m.sevensegment No: %m.index', 'sevenSegment', 1, 1],
-            [' ', 'LineTracer: Move along the line at %n speed', 'doLinetracer', 80],
-            [' ', 'LineTracer: Change the value of the %m.linetracerSensors to %n', 'changeThreshold', 'left sensor', 130]
+            [' ', '7Segment Value: %m.sevensegment No: %m.index', 'sevenSegment', 1, 1]
         ],
         ko: [
             ['r', '측정센서 %m.mesures 번호: %m.index', 'inputSensor', '바닥감지', 1],
@@ -705,9 +627,7 @@
             [' ', '모바일로봇 %m.directs 으로 움직이기 속도: %n', 'moveDirect', '앞', 100],
             [' ', '모바일로봇 왼쪽바퀴 %m.dcmotor 속도: %n 오른쪽바퀴: %m.dcmotor 속도: %n ', 'move', '시계방향', 100, '반시계방향', 100],
             [' ', '부저 %n Hz 번호: %m.index', 'buzzer', 250, 1],
-            [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1],
-            [' ', '라인트레이서 %n 의 속도로 움직이기', 'doLinetracer', 80],
-            [' ', '라인트레이서 %m.linetracerSensors 역치값 %n 으로 변경하기', 'changeThreshold', '왼쪽센서', 130]
+            [' ', '7세그먼트 값: %m.sevensegment 번호: %m.index', 'sevenSegment', 1, 1]
         ]
     };
 
@@ -721,8 +641,7 @@
             ledtoggle: ['ON', 'OFF'],
             dcmotor: ['clockwise', 'counterclockwise'],
             directs: ['forward', 'backward', 'left', 'right'],
-            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            linetracerSensors: ['left sensor', 'right sensor']
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         },
         ko: {
             index: [1, 2, 3, 4],
@@ -733,8 +652,7 @@
             ledtoggle: ['켜기', '끄기'],
             dcmotor: ['시계방향', '반시계방향'],
             directs: ['앞', '뒤', '왼쪽', '오른쪽'],
-            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            linetracerSensors: ['왼쪽 센서', '오른쪽 센서']
+            sevensegment: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         }
     }
 
