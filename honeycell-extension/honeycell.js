@@ -213,7 +213,6 @@
                 hdRemoteData.DC_MOTOR[HoneyCell.FLAG] = true;
                 for(var i=0; i<HoneyCell.MAX_NUMBER_OF_MODULES; i++)
                     hdRemoteData.DC_MOTOR[i+1] = 0;
-                linetracer.flag = false;
             }
         } else if(handler.hasOwnProperty(HoneyCell.DC_MOTOR)) {
             if(hdRemoteData.DC_MOTOR[handler.idx]!=handler.dc_motor && (!hdRemoteData.DC_MOTOR[HoneyCell.FLAG])) {
@@ -253,7 +252,6 @@
         if(handler.hasOwnProperty(HoneyCell.SET_ZERO)) { // Always footer position in handleRemoteData function
             if(handler.flag){
                 setZero.set_zero = true;
-                linetracer.flag = false;
                 for(var key in hdRemoteData)
                     hdRemoteData[key] = [true, 0, 0, 0, 0]; 
             }       
@@ -305,9 +303,6 @@
             for(var key in hdRemoteData){
                 hdRemoteData[key] = [false, null, null, null, null];            
             }
-            lineTracer.flag = false;
-            lineTracer.speed = null;
-            setZero.set_zero = false;
         } else {
             for(var key in hdRemoteData)
                 hdRemoteData[key][HoneyCell.FLAG] = false;
