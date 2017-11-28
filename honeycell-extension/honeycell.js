@@ -322,7 +322,6 @@
         var rqValue = requestLocalData();
         if(rqValue) {
             var sd = new Uint8Array(rqValue);
-            console.log(device);
             device.send(sd.buffer);
         }
     };
@@ -382,6 +381,7 @@
         });
 
         watchdog = setTimeout(function() {
+            console.log("call watchdog!!");
             if(poller) clearInterval(poller);
             if(connected) connected = false;
             poller = null;
@@ -419,6 +419,7 @@
         pinger = setInterval(function() {
         if (pinging) {
             if (++pingCount > 10) {
+                console.log("pinger setInterval call!!");
                 clearInterval(pinger);
                 initFlag = false;
                 pinger = null;
@@ -427,7 +428,6 @@
                 if (device) device.close();
                 device = null;
                 pinging = false;
-                console.log("pinger setInterval call!!");
                 return;
             }
         } else {
