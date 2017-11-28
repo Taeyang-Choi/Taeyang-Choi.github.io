@@ -358,9 +358,10 @@
         device = null;
     };
 
-    var comport = [];
+    var potentialDevices = [];
     ext._deviceConnected = function(dev) {
-        comport.push(dev);
+        potentialDevices.push(dev);
+        
         if (!device) { 
             console.log("Try Connect!!");
             tryNextDevice();
@@ -370,7 +371,7 @@
     var poller = null;
     var watchdog = null;
     function tryNextDevice() { 
-        device = comport.shift();
+        device = potentialDevices.shift();
         if(!device) return;
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
