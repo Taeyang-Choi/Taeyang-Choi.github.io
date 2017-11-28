@@ -366,8 +366,8 @@
     ext._deviceConnected = function(dev) {
         comport.push(dev);
         if (!device) { 
-            tryNextDevice();
             console.log("Try Connect!!");
+            tryNextDevice();
         }
     };
 
@@ -379,10 +379,10 @@
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
-        //console.log("initFlag:" + initFlag + " pinging: " + pinging + " pingCount:" + pingCount);
         device.set_receive_handler(function(data) {
             processInput(data);
         });
+        console.log(device);
 
         watchdog = setTimeout(function() {
             if(poller) clearInterval(poller);
