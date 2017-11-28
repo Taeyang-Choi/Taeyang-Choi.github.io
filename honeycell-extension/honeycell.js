@@ -397,7 +397,7 @@
     }
 
     function queryFirmware() {
-        device.send();
+        console.log("device id : " + device.id);
       }
 
     var initFlag = false;
