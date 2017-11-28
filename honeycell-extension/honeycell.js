@@ -361,7 +361,7 @@
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
         potentialDevices.push(dev);
-        
+        console.log(potentialDevices);
         if (!device) { 
             console.log("Try Connect!!");
             tryNextDevice();
