@@ -322,6 +322,7 @@
         var rqValue = requestLocalData();
         if(rqValue) {
             var sd = new Uint8Array(rqValue);
+            console.log(device);
             device.send(sd.buffer);
         }
     };
