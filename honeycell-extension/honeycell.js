@@ -361,8 +361,6 @@
     var comport = [];
     ext._deviceConnected = function(dev) {
         comport.push(dev);
-        console.log("_deviceConnected comport");
-        console.log(comport);
         if (!device) { 
             console.log("Try Connect!!");
             tryNextDevice();
@@ -371,9 +369,7 @@
 
     var poller = null;
     var watchdog = null;
-    function tryNextDevice() {
-        console.log("tryNextDevice comport");
-        console.log(comport);  
+    function tryNextDevice() { 
         device = comport.shift();
         if(!device) return;
 
