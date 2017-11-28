@@ -381,13 +381,13 @@
         });
 
         watchdog = setTimeout(function() {
-            console.log("call watchdog!!");
             if(poller) clearInterval(poller);
             if(connected) connected = false;
             poller = null;
             device.set_receive_handler(null);
             device.close();
             device = null;
+            console.log("call watchdog!!");
             tryNextDevice();
         }, 5000); 
     }
