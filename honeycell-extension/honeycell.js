@@ -361,6 +361,8 @@
     var comport = [];
     ext._deviceConnected = function(dev) {
         comport.push(dev);
+        console.log("_deviceConnected comport");
+        console.log(comport);
         if (!device) { 
             console.log("Try Connect!!");
             tryNextDevice();
@@ -369,7 +371,9 @@
 
     var poller = null;
     var watchdog = null;
-    function tryNextDevice() {  
+    function tryNextDevice() {
+        console.log("tryNextDevice comport");
+        console.log(comport);  
         device = comport.shift();
         if(!device) return;
 
@@ -378,7 +382,6 @@
         device.set_receive_handler(function(data) {
             processInput(data);
         });
-        console.log(device);
 
         watchdog = setTimeout(function() {
             if(poller) clearInterval(poller);
