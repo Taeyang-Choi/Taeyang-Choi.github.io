@@ -62,8 +62,6 @@
         DC_MOTOR: "dc_motor",
         MOVE: "move",
         STOP: "stop",
-        LINE_TRACER: "line_tracer",
-        THRESHOLD: "threshold",
         BUZZER: "buzzer",
         SEVEN_SEGMENT: "seven_segment",
         LED_R: "led_r",  
@@ -338,6 +336,7 @@
         console.log('Extension Shutdowned');
         if(connected) connected = false;
         if(poller) poller = clearInterval(poller);
+        device.set_receive_handler(null);
         if(device) device.close();
         device = null;
     };
@@ -354,6 +353,8 @@
         if(connected) connected = false;
         if(device != dev) return;
         if(poller) poller = clearInterval(poller);
+        device.set_receive_handler(null);
+        if(device) device.close();
         device = null;
     };
 
@@ -397,6 +398,7 @@
     function processInput(data) {
         if(!initFlag) {
             connected = true;
+            console.log("connected!!");
             if (watchdog) {
                 clearTimeout(watchdog);
                 watchdog = null;
@@ -415,11 +417,12 @@
     function init() {
         pinger = setInterval(function() {
         if (pinging) {
-            if (++pingCount > 6) {
+            if (++pingCount > 10) {
                 clearInterval(pinger);
                 initFlag = false;
                 pinger = null;
                 connected = false;
+                device.set_receive_handler(null);
                 if (device) device.close();
                 device = null;
                 pinging = false;
@@ -439,6 +442,7 @@
 
     ext._shutdown = function() {
         if(connected) connected = false;
+        device.set_receive_handler(null);
         if (device) device.close();
         device = null;
     };
