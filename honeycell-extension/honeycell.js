@@ -380,9 +380,13 @@
             processInput(data);
         });
 
+        poller = setInterval(function() {
+          queryFirmware();
+        }, 1000);
+
         watchdog = setTimeout(function() {
-            if(poller) clearInterval(poller);
             if(connected) connected = false;
+            if(poller) clearInterval(poller);
             poller = null;
             device.set_receive_handler(null);
             device.close();
@@ -391,6 +395,10 @@
             tryNextDevice();
         }, 5000); 
     }
+
+    function queryFirmware() {
+        device.send();
+      }
 
     var initFlag = false;
     var pinging = false;
