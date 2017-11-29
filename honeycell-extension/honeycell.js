@@ -358,7 +358,6 @@
         if(device) device.close();
         device = null;
         initFlag = false;
-        pingCount = 0;
     };
 
     var potentialDevices = [];
@@ -372,11 +371,13 @@
 
     var poller = null;
     var watchdog = null;
+    var initPt = new Uint8Array([2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3]);
     function tryNextDevice() {
         device = potentialDevices.shift();
         if(!device) return;
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
+        device.send(initPt.buffer);
         console.log('Attempting connection with ' + device.id);
 
         device.set_receive_handler(function(data) {
