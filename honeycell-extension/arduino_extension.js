@@ -493,37 +493,42 @@
 
   var potentialDevices = [];
   ext._deviceConnected = function(dev) {
+    console.log("1. Start of _deviceConnected");
     potentialDevices.push(dev);
-    console.log("call _deviceConnected!!");
     if (!device)
       tryNextDevice();
+    console.log("8. End of _deviceConnected");
   };
 
   var poller = null;
   var watchdog = null;
   function tryNextDevice() {
+    console.log("2. Start of tryNextDevice ")
     device = potentialDevices.shift();
     if (!device) return;
 
+    console.log("3. Before device.open()");
     device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-    console.log('Attempting connection with ' + device.id);
+    console.log('4. Attempting connection with ' + device.id);
     device.set_receive_handler(function(data) {
       var inputData = new Uint8Array(data);
       processInput(inputData);
     });
-
+    console.log("5. Call poller");
     poller = setInterval(function() {
       queryFirmware();
     }, 1000);
-
+    console.log("6. Call watchdog");
     watchdog = setTimeout(function() {
       clearInterval(poller);
       poller = null;
       device.set_receive_handler(null);
       device.close();
       device = null;
+      console.log("Call watchdog!!");
       tryNextDevice();
     }, 5000);
+    console.log("7. End of tryNextDevice");
   }
 
   ext._shutdown = function() {
