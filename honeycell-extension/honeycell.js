@@ -334,12 +334,12 @@
 
     ext._shutdown = function() {
         console.log('Extension Shutdowned');
-        initFlag = false;
         if(connected) connected = false;
         if(poller) poller = clearInterval(poller);
         device.set_receive_handler(null);
         if(device) device.close();
         device = null;
+        initFlag = false;
     };
 
     ext._getStatus = function() {
@@ -351,44 +351,38 @@
 
     ext._deviceRemoved = function(dev) {
         console.log('Device removed');
-        initFlag = false;
         if(connected) connected = false;
         if(device != dev) return;
         if(poller) poller = clearInterval(poller);
         device.set_receive_handler(null);
         if(device) device.close();
         device = null;
+        initFlag = false;
     };
 
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
-        console.log("1. Start of _deviceConnected()");
         potentialDevices.push(dev);
         if (!device) { 
             console.log("Try Connect!!");
             tryNextDevice();
         }
-        console.log("7. End of _deviceConnected()");
     };
 
     var poller = null;
     var watchdog = null;
     function tryNextDevice() {
-        console.log("2. Start of tryNextDevice()") 
         device = potentialDevices.shift();
         if(!device) return;
 
-        console.log("3. Before device.open() function");
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-        //console.log('Attempting connection with ' + device.id);
-        console.log("4. After device.open() and attempting connection with " + device.id);
+        console.log('Attempting connection with ' + device.id);
 
         device.set_receive_handler(function(data) {
             console.log("Call device.set_receive_handler()");
             processInput(data);
         });
 
-        console.log("5. Before watchdog");
         watchdog = setTimeout(function() {
             if(connected) connected = false;
             if(poller) clearInterval(poller);
@@ -400,7 +394,6 @@
             console.log("Call watchdog!!");
             tryNextDevice();
         }, 5000);
-        console.log("6. End of tryNextDevice()"); 
     }
     
     var initFlag = false;
