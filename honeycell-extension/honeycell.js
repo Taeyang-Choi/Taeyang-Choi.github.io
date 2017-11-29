@@ -358,6 +358,7 @@
         if(device) device.close();
         device = null;
         initFlag = false;
+        pingCount = 0;
     };
 
     var potentialDevices = [];
@@ -390,6 +391,7 @@
             device.close();
             device = null;
             initFlag = false;
+            pingCount = 0;
             tryNextDevice();
         }, 5000);
     }
@@ -430,6 +432,7 @@
                 device = null;
                 initFlag = false;
                 pinging = false;
+                pingCount = 0;
                 console.log("Call pinger setInterval!!");
                 return;
             }
@@ -437,6 +440,7 @@
             if (!device) {
                 clearInterval(pinger);
                 pinger = null;
+                console.log("Remove pinger!!");
                 return;
             }
             pinging = true;
