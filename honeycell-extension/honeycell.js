@@ -334,6 +334,7 @@
 
     ext._shutdown = function() {
         console.log('Extension Shutdowned');
+        initFlag = false;
         if(connected) connected = false;
         if(poller) poller = clearInterval(poller);
         device.set_receive_handler(null);
@@ -350,6 +351,7 @@
 
     ext._deviceRemoved = function(dev) {
         console.log('Device removed');
+        initFlag = false;
         if(connected) connected = false;
         if(device != dev) return;
         if(poller) poller = clearInterval(poller);
@@ -382,6 +384,7 @@
         console.log("4. After device.open() and attempting connection with " + device.id);
 
         device.set_receive_handler(function(data) {
+            console.log("Call device.set_receive_handler()");
             processInput(data);
         });
 
@@ -393,6 +396,7 @@
             device.set_receive_handler(null);
             device.close();
             device = null;
+            initFlag = false;
             console.log("Call watchdog!!");
             tryNextDevice();
         }, 5000);
@@ -428,12 +432,12 @@
             if (++pingCount > 10) {
                 console.log("pinger setInterval call!!");
                 clearInterval(pinger);
-                initFlag = false;
                 pinger = null;
                 connected = false;
                 device.set_receive_handler(null);
                 if (device) device.close();
                 device = null;
+                initFlag = false;
                 pinging = false;
                 return;
             }
@@ -453,6 +457,7 @@
         device.set_receive_handler(null);
         if (device) device.close();
         device = null;
+        initFlag = false;
     };
 
     ext.inputSensor = function(module, index) {
