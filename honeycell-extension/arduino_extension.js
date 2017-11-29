@@ -500,12 +500,13 @@
 
   var poller = null;
   var watchdog = null;
+  var con = null;
   function tryNextDevice() {
     device = potentialDevices.shift();
     if (!device) return;
 
-    var b = device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-    console.log('Attempting connection with ' + device.id + " " + b);
+    con = device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
+    console.log('Attempting connection with ' + device.id + ", con: " + con);
     device.set_receive_handler(function(data) {
       var inputData = new Uint8Array(data);
       processInput(inputData);
