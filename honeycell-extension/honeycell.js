@@ -375,7 +375,8 @@
         device = potentialDevices.shift();
         if(!device) return;
 
-        device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
+        device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 1 });
+        device.send();
         console.log('Attempting connection with ' + device.id);
 
         device.set_receive_handler(function(data) {
