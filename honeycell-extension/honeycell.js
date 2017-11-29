@@ -360,26 +360,32 @@
 
     var potentialDevices = [];
     ext._deviceConnected = function(dev) {
+        console.log("Start of _deviceConnected()");
         potentialDevices.push(dev);
-        console.log("call _deviceConnected");
         if (!device) { 
             console.log("Try Connect!!");
             tryNextDevice();
         }
+        console.log("End of _deviceConnected()")
     };
 
     var poller = null;
     var watchdog = null;
-    function tryNextDevice() { 
+    function tryNextDevice() {
+        console.log("Start of tryNextDevice()") 
         device = potentialDevices.shift();
         if(!device) return;
 
+        console.log("Before device.open() function");
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-        console.log('Attempting connection with ' + device.id);
+        //console.log('Attempting connection with ' + device.id);
+        console.log("After device.open() and attempting connection with " + device.id);
+
         device.set_receive_handler(function(data) {
             processInput(data);
         });
 
+        console.log("Before watchdog");
         watchdog = setTimeout(function() {
             if(connected) connected = false;
             if(poller) clearInterval(poller);
@@ -387,9 +393,10 @@
             device.set_receive_handler(null);
             device.close();
             device = null;
-            console.log("call watchdog!!");
+            console.log("Call watchdog!!");
             tryNextDevice();
-        }, 5000); 
+        }, 5000);
+        console.log("End of tryNextDevice()"); 
     }
     
     var initFlag = false;
