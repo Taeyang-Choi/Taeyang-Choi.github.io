@@ -371,13 +371,11 @@
 
     var poller = null;
     var watchdog = null;
-    var test = new Uint8Array();
     function tryNextDevice() {
         device = potentialDevices.shift();
         if(!device) return;
 
-        device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 1 });
-        device.send(test.buffer);
+        device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
 
         device.set_receive_handler(function(data) {
@@ -392,7 +390,6 @@
             device.close();
             device = null;
             initFlag = false;
-            console.log("Call watchdog!!");
             tryNextDevice();
         }, 5000);
     }
