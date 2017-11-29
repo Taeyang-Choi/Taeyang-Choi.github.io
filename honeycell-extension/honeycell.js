@@ -371,16 +371,14 @@
 
     var poller = null;
     var watchdog = null;
-    var con = null;
     function tryNextDevice() {
         device = potentialDevices.shift();
         if(!device) return;
 
-        con = device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-        console.log('Attempting connection with ' + device.id + ", con: " + con);
+        device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
+        console.log('Attempting connection with ' + device.id);
 
         device.set_receive_handler(function(data) {
-            console.log("Call device.set_receive_handler()");
             processInput(data);
         });
 
