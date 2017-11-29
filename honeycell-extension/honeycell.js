@@ -407,6 +407,7 @@
             if (watchdog) {
                 clearTimeout(watchdog);
                 watchdog = null;
+                console.log("Remove watchdog!!");
             }
             init();
             initFlag = true;
@@ -423,7 +424,6 @@
         pinger = setInterval(function() {
         if (pinging) {
             if (++pingCount > 10) {
-                console.log("pinger setInterval call!!");
                 clearInterval(pinger);
                 pinger = null;
                 connected = false;
@@ -432,6 +432,7 @@
                 device = null;
                 initFlag = false;
                 pinging = false;
+                console.log("Call pinger setInterval!!");
                 return;
             }
         } else {
