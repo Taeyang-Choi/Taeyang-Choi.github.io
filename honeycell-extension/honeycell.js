@@ -371,6 +371,7 @@
     var poller = null;
     var watchdog = null;
     function tryNextDevice() {
+        console.log("Start of tryNextDevice");
         device = potentialDevices.shift();
         if(!device) return;
         if(device.id = "COM7") return;
