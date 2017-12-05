@@ -425,13 +425,13 @@
                 clearInterval(pinger);
                 pinger = null;
                 connected = false;
-                device.set_receive_handler(null);
+                //device.set_receive_handler(null);
                 if (device) device.close();
                 device = null;
                 initFlag = false;
                 pinging = false;
                 pingCount = 0;
-                console.log("Call pinger setInterval!!, device: " + device);
+                console.log("Call pinger setInterval!!");
                 return;
             }
         } else {
