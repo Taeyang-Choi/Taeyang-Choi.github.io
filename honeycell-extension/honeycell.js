@@ -371,10 +371,8 @@
     var poller = null;
     var watchdog = null;
     function tryNextDevice() {
-        //console.log("Start of tryNextDevice");
         device = potentialDevices.shift();
         if(!device) return;
-        //if(device.id = "COM7") return;
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
@@ -445,7 +443,7 @@
             }
             pinging = true;
         }
-        }, 100);
+        }, 50);
     }
 
     ext._shutdown = function() {
