@@ -431,7 +431,7 @@
                 initFlag = false;
                 pinging = false;
                 pingCount = 0;
-                console.log("Call pinger setInterval!!");
+                console.log("Call pinger setInterval!!, device: " + device);
                 return;
             }
         } else {
