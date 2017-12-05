@@ -373,10 +373,11 @@
     function tryNextDevice() {
         device = potentialDevices.shift();
         if(!device) return;
+        var t = new Uint8Array([1, 2, 3]);
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
-
+        device.send(t.buffer);
         device.set_receive_handler(function(data) {
             processInput(data);
         });
