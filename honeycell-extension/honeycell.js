@@ -443,7 +443,7 @@
             }
             pinging = true;
         }
-        }, 50);
+        }, 100);
     }
 
     ext._shutdown = function() {
