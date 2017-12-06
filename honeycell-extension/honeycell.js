@@ -147,15 +147,16 @@
         data.forEach(function(element) {
             receiveData.push(element);
         }, receiveData);
-        if(receiveData[HoneyCell.STX_IDX] != HoneyCell.STX) {
-            for(var i=0; i<receiveData.length; i++) {
+        if(receiveData[0] != HoneyCell.STX) {
+            for(var i=1; i<receiveData.length; i++) {
                 if(receiveData[i] == HoneyCell.STX) {
                     receiveData = receiveData.splice(i, receiveData.length-i);
                     return;
                 }
             }
+            if(i == receiveData.length) 
+                receiveData = [];
         }
-        //console.log(receiveData);
     };
 
     requestRemoteData = function() { // default function(handler)
@@ -326,16 +327,12 @@
         }
     };
 
-
-
     var connected = false;
     var device = null; 
     var rawData = null;
-
     ext._shutdown = function() {
         console.log('Extension Shutdowned');
         if(connected) connected = false;
-        if(poller) poller = clearInterval(poller);
         device.set_receive_handler(null);
         if(device) device.close();
         device = null;
@@ -353,7 +350,6 @@
         console.log('Device removed');
         if(connected) connected = false;
         if(device != dev) return;
-        if(poller) poller = clearInterval(poller);
         device.set_receive_handler(null);
         if(device) device.close();
         device = null;
@@ -368,7 +364,6 @@
         }
     };
 
-    var poller = null;
     var watchdog = null;
     function tryNextDevice() {
         device = potentialDevices.shift();
@@ -378,13 +373,12 @@
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
         device.set_receive_handler(function(data) {
-            processInput(data);
+            rawData = new Uint8Array(data);
+            processInput(rawData);
         });
 
         watchdog = setTimeout(function() {
             if(connected) connected = false;
-            if(poller) clearInterval(poller);
-            poller = null;
             device.set_receive_handler(null);
             device.close();
             device = null;
@@ -399,29 +393,32 @@
     var pingCount = 0;
     var pinger = null;
     function processInput(data) {
-        if(!initFlag) {
-            connected = true;
-            console.log("connected!!");
-            if (watchdog) {
-                clearTimeout(watchdog);
-                watchdog = null;
-                console.log("Remove watchdog!!");
-            }
-            init();
-            initFlag = true;
-        } else {
-            rawData = new Uint8Array(data);
-            handleLocalData(rawData);
-            requestRemoteData();
+        if(initFlag) {
             pinging = false;
             pingCount = 0;
+        } else {
+            init();
         }
+        handleLocalData(data);
+        requestRemoteData();
+    }
+
+    function init() {
+        connected = true;
+        console.log("connected!!");
+        if (watchdog) {
+            clearTimeout(watchdog);
+            watchdog = null;
+            console.log("Remove watchdog!!");
+        }
+        Pinger();
+        initFlag = true;
     }
         
-    function init() {
+    function Pinger() {
         pinger = setInterval(function() {
         if (pinging) {
-            if (++pingCount > 10) {
+            if (++pingCount > 6) {
                 clearInterval(pinger);
                 pinger = null;
                 connected = false;
@@ -443,7 +440,7 @@
             }
             pinging = true;
         }
-        }, 50);
+        }, 100);
     }
 
     ext._shutdown = function() {
