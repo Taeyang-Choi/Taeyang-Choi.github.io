@@ -350,7 +350,6 @@
         console.log('Device removed');
         if(connected) connected = false;
         if(device != dev) return;
-        device.set_receive_handler(null);
         if(device) device.close();
         device = null;
         initFlag = false;
@@ -368,7 +367,6 @@
     function tryNextDevice() {
         device = potentialDevices.shift();
         if(!device) return;
-        var t = new Uint8Array([1, 2, 3]);
 
         device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
         console.log('Attempting connection with ' + device.id);
