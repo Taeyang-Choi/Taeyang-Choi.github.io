@@ -368,13 +368,14 @@
         device = potentialDevices.shift();
         if(!device) return;
 
-        device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 });
-        console.log('Attempting connection with ' + device.id);
-        device.set_receive_handler(function(data) {
-            rawData = new Uint8Array(data);
-            processInput(rawData);
+        device.open({ stopBits: 0, bitRate: 57600, ctsFlowControl: 0 }, function() {
+            console.log('Attempting connection with ' + device.id);
+            device.set_receive_handler(function(data) {
+                rawData = new Uint8Array(data);
+                processInput(rawData);
+            });    
         });
-
+        
         watchdog = setTimeout(function() {
             if(connected) connected = false;
             device.set_receive_handler(null);
