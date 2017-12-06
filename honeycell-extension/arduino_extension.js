@@ -125,6 +125,7 @@
           connected = false;
           if (device) device.close();
           device = null;
+          console.log("Call pinger() 6 times!!")
           return;
         }
       } else {
@@ -527,6 +528,7 @@
 
   ext._shutdown = function() {
     // TODO: Bring all pins down
+    console.log("Call ext._shutdown()!!");
     if (device) device.close();
     if (poller) clearInterval(poller);
     device = null;
